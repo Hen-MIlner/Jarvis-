@@ -81,6 +81,9 @@ textarea{resize:vertical;min-height:80px}.formrow{display:grid;grid-template-col
 .plan .item.now{background:#0f2a40;border-radius:10px;padding-left:10px;border:1px solid #1f5a78}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102337;border:1px solid #2a6681;padding:10px 16px;border-radius:12px;z-index:30;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
+.modal{position:fixed;inset:0;background:#000b;backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:18px;z-index:40}.modal.show{display:flex}
+.sheet{position:relative;background:linear-gradient(145deg,#0e1a2b,#0a1220);border:1px solid #25496a;border-radius:22px;padding:26px;width:min(620px,100%);max-height:88dvh;overflow:auto;box-shadow:0 0 60px #00e1ff1f;animation:fade .2s ease}
+.sheet h3{font:600 14px 'Space Grotesk';color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin:20px 0 6px}.sheet li{margin:5px 0}.sheet .x{position:absolute;right:14px;top:14px;padding:6px 10px}
 @media(max-width:950px){.stats{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
 @media(max-width:720px){aside{position:fixed;inset:0 auto 0 0;width:min(290px,85vw);transform:translateX(-102%);transition:.2s}aside.open{transform:none}
 .scrim.show{display:block;position:fixed;inset:0;background:#0009;z-index:4}.menu{display:inline-block}.topbar{padding:0 15px}#content{padding:17px 14px 35px}
@@ -196,6 +199,7 @@ textarea{resize:vertical;min-height:80px}.formrow{display:grid;grid-template-col
   </div>
 </section>
 </div></main></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -215,10 +219,12 @@ const validDT=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v)&
 
 /* ---- weekly schedule (edit times here, or in the calendar) ---- */
 const WEEK=[ // day 0=Sun … 6=Sat. until = last date it runs
- {d:1,t:'Easy run',s:'06:45',e:'07:10',n:'Easy pace — you should be able to chat.'},
+ {d:1,t:'Interval run',s:'06:30',e:'07:15',n:'Hard intervals — tap the plan for the full session.'},
  {d:2,t:'Plyometrics & acceleration',s:'06:45',e:'07:20',n:'Jumps, bounds and short accelerations.'},
  {d:3,t:'Cricket training',s:'16:30',e:'17:30',until:'2027-02-24'},
  {d:3,t:'Futsal (play & referee)',s:'17:30',e:'18:30',until:'2026-12-16',n:'Time is a guess — edit it.'},
+ {d:4,t:'Strength & core',s:'06:30',e:'07:00',n:'Bodyweight strength — tap the plan for details.'},
+ {d:0,t:'Long run',s:'08:00',e:'08:55',n:'Steady long run — tap the plan for details.'},
  {d:4,t:'Referee futsal',s:'17:20',e:'18:20',until:'2026-12-16'},
  {d:5,t:'Cricket',s:'16:00',e:'19:00',until:'2027-02-24',n:'Time is a guess — edit it.'},
  {d:6,t:'Cricket',s:'09:00',e:'15:00',until:'2027-02-24',n:'Time is a guess — edit it.'}];
@@ -229,11 +235,37 @@ function seedSchedule(){
   WEEK.forEach(w=>{if(w.d===d.getDay()&&(!w.until||k<=w.until))add(w.t,k+'T'+w.s,k+'T'+w.e,{n:w.n})})}
  add('Work shift — Caffe Belgiorno','2026-11-09T18:00','2026-11-09T20:00',{l:'Caffe Belgiorno'});
  data.seeded=true;save();return n}
-if(!data.seeded)seedSchedule();
+if(data.v!==2){data.events=data.events.filter(e=>!(e.title==='Easy run'&&(e.notes||'').startsWith('Easy pace')));data.v=2;seedSchedule()}else if(!data.seeded)seedSchedule();
 
 /* ---- running plan ---- */
-const PLAN=[['Sun','Rest','Full rest day. Sleep well.'],['Mon','Easy run','__E__'],['Tue','Plyometrics & acceleration','Jumps, bounds, 6×20 m accelerations.'],
- ['Wed','Cricket + futsal','No extra hard running today.'],['Thu','Recovery + refereeing','Stretch, light walk, foam roll.'],['Fri','Cricket','Match day — warm up well.'],['Sat','Cricket','Match day — refuel after.']];
+const W=()=>planWeek();
+const SOLO='Solo session — no partner or coach needed.';
+const PLAN=[
+ {day:'Sun',title:'Long run + hills',min:()=>Math.min(55,30+W()*3),gear:['Running shoes','Phone or watch (timer/GPS)','Water bottle','Hat + sunscreen','A route with a hill (or stairs)'],
+  steps:()=>{const w=W(),h=w>=2?Math.min(6,w):0;return['Warm-up: 5 min walk then easy jog.',`Main: ${Math.min(55,30+w*3)} min steady run at a conversational pace (RPE 5–6/10).`,h?`Hills: after the steady run do ${h} × 30–40 sec hard uphill, walk back down.`:'Hills unlock from week 3.','Finish: last 5 min of the steady run, pick up the pace a little.','Cool-down: 5 min walk, then calf, hamstring, quad and hip-flexor stretches (30 sec each).']},
+  tips:['Skip or shorten this run if you are sore or sick from the weekend.','Eat something light 1–2 hours before.']},
+ {day:'Mon',title:'Interval run',min:()=>35+Math.min(W(),4)*2,gear:['Running shoes','Phone/watch with an interval timer','Water bottle','Flat path, oval or track'],
+  steps:()=>{const w=W(),r=Math.min(8,4+Math.floor(w/2)),m=w<4?3:4;return['Warm-up: 8 min easy jog, then leg swings, high knees, butt kicks (2 × 10 each).',`Main: ${r} × ${m} min HARD (RPE 8/10 — you can only say a few words), with 90 sec easy jog between each.`,'Keep every hard rep the same pace. If rep 1 is much faster than rep 5, you started too fast.','Cool-down: 5 min walk/jog, then stretch calves, hamstrings and hips.']},
+  tips:['Set the interval timer on your phone so you can do this alone.','Stop if you feel sharp pain or dizziness.']},
+ {day:'Tue',title:'Plyometrics + sprints',min:()=>40,gear:['Trainers or spikes','4 cones, bottles or shoes as markers','Stopwatch/phone','Flat grass or track','A step or low box (optional)'],
+  steps:()=>{const w=W(),r=Math.min(10,6+Math.floor(w/2));return['Warm-up: 8 min jog + dynamic stretches + 3 × 20 m build-ups.',`Sprints: ${r} × 20 m all-out from a standing start, walk back for full recovery (about 60–90 sec).`,'Plyos (3 rounds, 90 sec rest): 8 squat jumps, 6 bounds per leg, 6 box/step jumps (or tuck jumps), 10 skater hops.','Time 2–3 of your sprints with your phone (film from the side) and log your best in the Sprint tracker.','Cool-down: 5 min walk and stretch.']},
+  tips:['Land softly, knees over toes, and stop a rep if your form falls apart.','Quality over quantity — fully recover between sprints.']},
+ {day:'Wed',title:'Cricket + futsal',min:()=>90,gear:['Cricket gear','Futsal shoes + shin pads','Water bottle','Snack for between sessions'],
+  steps:()=>['Warm-up: 5 min jog and dynamic stretches before cricket training.','No extra hard running today — cricket and futsal are your load.','After futsal: 10 min stretching/mobility and rehydrate.','Eat protein + carbs within an hour of finishing.'],tips:['Tired legs on Thursday? That is normal — keep Thursday light.']},
+ {day:'Thu',title:'Strength & core + refereeing',min:()=>30,gear:['Exercise mat','Backpack with books (for weight, optional)','Resistance band (optional)','Water bottle'],
+  steps:()=>{const r=Math.min(4,3+Math.floor(W()/4));return['Warm-up: 3 min jog on the spot, arm circles, bodyweight squats.',`Do ${r} rounds with 60 sec rest: 10 split squats per leg, 8 single-leg RDLs per leg, 15 glute bridges, 12 push-ups, 20 calf raises.`,'Core finisher: 45 sec plank, 30 sec side plank each side, 20 dead bugs.','Later: refereeing futsal — jog lightly to warm up and keep drinking water.']},
+  tips:['Slow down on the way down for each rep — that is where strength is built.','Use a loaded backpack to make it harder.']},
+ {day:'Fri',title:'Cricket',min:()=>180,gear:['Cricket kit','Water bottle','Sunscreen + hat','Food for after'],
+  steps:()=>['Pre-game activation (10 min): 3 min jog, leg swings, lunges with a twist, 3 × 20 m build-ups.','Stay hydrated through the day.','After: cool-down walk, stretch, then eat protein + carbs.'],tips:['Go to bed early — Saturday is another match day.']},
+ {day:'Sat',title:'Cricket',min:()=>360,gear:['Cricket kit','Water bottle','Sunscreen + hat','Food for after'],
+  steps:()=>['Pre-game activation (10 min): jog, dynamic stretches, build-ups.','Drink regularly and eat during breaks.','After: easy walk, stretch, refuel and rest up for Sunday.'],tips:['If you feel flat on Sunday, shorten the long run.']}
+];
+function openSession(i){const p=PLAN[i],w=W();
+ $('#sheet').innerHTML=`<button class="btn x" id="mx">✕</button><div class="eyebrow">${p.day} · Week ${w+1}</div><h2 class="heading" style="margin:4px 0 8px">${p.title}</h2><span class="tag">~${p.min()} min</span> <span class="tag">${SOLO.slice(0,-1)}</span>
+ <h3>Equipment you need</h3><ul>${p.gear.map(g=>`<li>${g}</li>`).join('')}</ul><h3>The session</h3><ol>${p.steps().map(x=>`<li>${x}</li>`).join('')}</ol><h3>Tips</h3><ul>${p.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+ <p class="muted small">Stop and rest if you feel sharp pain, dizziness or unusual soreness. Miss a session rather than train through an injury.</p>`;
+ $('#modal').classList.add('show');$('#mx').onclick=closeSession}
+function closeSession(){$('#modal').classList.remove('show')}
 if(!data.planStart){data.planStart=todayISO();save()}
 const planWeek=()=>Math.floor((new Date(todayISO())-new Date(data.planStart))/6048e5);
 const easyMin=()=>Math.min(30,15+Math.min(planWeek(),5)*3);
@@ -307,8 +339,8 @@ function renderTraining(){const runs=data.runs,tot=runs.reduce((a,r)=>a+r.km,0),
  const km=ws.map(k=>runs.filter(r=>weekStart(r.date)===k).reduce((a,r)=>a+r.km,0)),mx=Math.max(1,...km);
  $('#runBars').innerHTML=km.map((v,i)=>`<div class="bar"><span>${Math.round(v*10)/10}</span><i style="height:${v/mx*100}%"></i><span>${ws[i].slice(8)}/${ws[i].slice(5,7)}</span></div>`).join('');
  const dow=new Date().getDay();
- $('#planList').innerHTML=PLAN.map((p,i)=>`<div class="item ${i===dow?'now':''}"><div class="item-main"><div class="item-title">${p[0]} — ${p[1]}</div><div class="item-meta">${p[2].replace('__E__',easyMin()+' min easy run, relaxed pace.')}</div></div></div>`).join('');
- $('#planNote').textContent=`Week ${planWeek()+1}: easy runs grow by 3 min each week up to 30 min. Add a minute to your tempo only when runs feel easy.`;
+ $('#planList').innerHTML=PLAN.map((p,i)=>({p,i})).sort((x,y)=>((x.i+6)%7)-((y.i+6)%7)).map(({p,i})=>`<div class="item ${i===dow?'now':''}" data-plan="${i}" style="cursor:pointer"><div class="item-main"><div class="item-title">${p.day} — ${p.title}</div><div class="item-meta">~${p.min()} min · ${p.gear.length} items of kit · tap for the full session</div></div><span class="muted">›</span></div>`).join('');$$('[data-plan]').forEach(b=>b.onclick=()=>openSession(+b.dataset.plan));
+ $('#planNote').textContent=`Week ${planWeek()+1}: this plan gets harder every week — more intervals, sprints, hills and longer runs. All of it can be done alone. Tap any day for steps and equipment.`;
  $('#runList').innerHTML=runs.length?[...runs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(r=>`<div class="item"><div class="item-main"><div class="item-title">${r.km} km · ${r.min} min · ${pace(r.km,r.min)}/km</div><div class="item-meta">${dateFmt(r.date,{day:'numeric',month:'short',year:'numeric'})} · ${esc(r.type)}</div></div><div class="item-actions"><button class="btn danger" data-rx="${esc(r.id)}">×</button></div></div>`).join(''):'<div class="empty">No runs logged yet.</div>';
  $$('[data-rx]').forEach(b=>b.onclick=()=>{data.runs=data.runs.filter(r=>r.id!==b.dataset.rx);save();renderTraining();renderHome()});
  $('#sprintList').innerHTML=data.sprints.length?[...data.sprints].reverse().slice(0,8).map(s=>`<div class="item"><div class="item-main"><div class="item-title">${s.distance} m — ${Number(s.time).toFixed(2)} s</div><div class="item-meta">${dateFmt(s.date,{day:'numeric',month:'short',year:'numeric'})}</div></div></div>`).join(''):'<div class="empty">No sprint times yet.</div>'}
@@ -364,6 +396,7 @@ $('#eraseData').onclick=()=>{if(confirm('This permanently deletes all Jarvis dat
 let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;$('#installBtn').hidden=false});
 $('#installBtn').onclick=async()=>{if(!ip)return;ip.prompt();await ip.userChoice;ip=null;$('#installBtn').hidden=true};
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeSession()};addEventListener('keydown',e=>{if(e.key==='Escape')closeSession()});
 $('#runDate').value=todayISO();$('#displayName').value=data.name||'';$('#assistantTone').value=data.tone||'direct';
 refreshClock();setInterval(refreshClock,30000);renderHome();renderCalendar();renderTasks();renderTraining();
 </script></body></html>
