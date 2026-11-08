@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" fill="none">
+<defs>
+<linearGradient id="cyanGlow" x1="80" y1="60" x2="250" y2="240"><stop stop-color="#8FFFFF"/><stop offset=".5" stop-color="#00D9FF"/><stop offset="1" stop-color="#287BFF"/></linearGradient>
+<linearGradient id="violetGlow" x1="150" y1="70" x2="230" y2="230"><stop stop-color="#B46CFF"/><stop offset="1" stop-color="#6425D9"/></linearGradient>
+<filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="softGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="14"/></filter>
+</defs>
+<rect width="900" height="300" rx="28" fill="#070B14"/>
+<g opacity=".12" stroke="#00D9FF" stroke-width="1"><path d="M0 60H900M0 120H900M0 180H900M0 240H900"/><path d="M60 0V300M120 0V300M180 0V300M240 0V300M300 0V300M360 0V300M420 0V300M480 0V300M540 0V300M600 0V300M660 0V300M720 0V300M780 0V300M840 0V300"/></g>
+<circle cx="158" cy="150" r="82" fill="#00D9FF" opacity=".14" filter="url(#softGlow)"/>
+<ellipse cx="158" cy="150" rx="104" ry="48" transform="rotate(-24 158 150)" stroke="url(#cyanGlow)" stroke-width="3" opacity=".8"/>
+<ellipse cx="158" cy="150" rx="104" ry="48" transform="rotate(42 158 150)" stroke="url(#violetGlow)" stroke-width="2" opacity=".8"/>
+<path d="M158 72L221 108V180L158 218L95 180V108L158 72Z" stroke="url(#cyanGlow)" stroke-width="5" fill="#0C1726" filter="url(#glow)"/>
+<path d="M158 102L190 121V159L158 178L126 159V121L158 102Z" fill="#07111E" stroke="#65F5FF" stroke-width="3"/>
+<path d="M158 116L177 127V151L158 162L139 151V127L158 116Z" fill="url(#cyanGlow)" opacity=".9" filter="url(#glow)"/>
+<g stroke="#55EEFF" stroke-width="3" stroke-linecap="round"><path d="M95 126H70V108H48"/><path d="M95 174H66V194H48"/><path d="M221 126H246V108H268"/><path d="M221 174H250V194H268"/></g>
+<g fill="#B46CFF"><circle cx="48" cy="108" r="5"/><circle cx="48" cy="194" r="5"/><circle cx="268" cy="108" r="5"/><circle cx="268" cy="194" r="5"/></g>
+<text x="315" y="173" fill="#F3FCFF" font-family="Arial,Helvetica,sans-serif" font-size="92" font-weight="700" letter-spacing="4">J</text>
+<text x="372" y="173" fill="url(#cyanGlow)" font-family="Arial,Helvetica,sans-serif" font-size="92" font-weight="700" letter-spacing="4">Arvis</text>
+<text x="378" y="211" fill="#6B8CA6" font-family="Arial,Helvetica,sans-serif" font-size="14" letter-spacing="6">ARTIFICIAL INTELLIGENCE INTERFACE</text>
+<circle cx="345" cy="206" r="4" fill="#00F0FF" filter="url(#glow)"/>
+</svg>
