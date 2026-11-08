@@ -81,6 +81,12 @@ textarea{resize:vertical;min-height:80px}.formrow{display:grid;grid-template-col
 .plan .item.now{background:#0f2a40;border-radius:10px;padding-left:10px;border:1px solid #1f5a78}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102337;border:1px solid #2a6681;padding:10px 16px;border-radius:12px;z-index:30;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
+.tmr{--pc:#00e1ff;position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:18px;text-align:center;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--pc) 22%,#050912),#050912 70%);transition:background .4s}
+.tmr.show{display:flex}.k-warm{--pc:#2a9bff}.k-work{--pc:#ff5a7a}.k-rest{--pc:#43d99a}.k-cool{--pc:#9055ff}
+.tbox{width:min(440px,100%)}.tphase{font:700 clamp(24px,6vw,34px) 'Space Grotesk';margin:8px 0 14px;color:var(--pc);text-shadow:0 0 24px var(--pc)}
+.ring{position:relative;width:min(300px,72vw);aspect-ratio:1;margin:0 auto 16px}.ring svg{width:100%;transform:rotate(-90deg)}
+.rbg{fill:none;stroke:#ffffff14;stroke-width:7}.rfg{fill:none;stroke:var(--pc);stroke-width:7;stroke-linecap:round;stroke-dasharray:339.3;stroke-dashoffset:0;filter:drop-shadow(0 0 8px var(--pc));transition:stroke .4s}
+#tClock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 clamp(52px,16vw,76px) 'Space Grotesk';font-variant-numeric:tabular-nums}
 .modal{position:fixed;inset:0;background:#000b;backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:18px;z-index:40}.modal.show{display:flex}
 .sheet{position:relative;background:linear-gradient(145deg,#0e1a2b,#0a1220);border:1px solid #25496a;border-radius:22px;padding:26px;width:min(620px,100%);max-height:88dvh;overflow:auto;box-shadow:0 0 60px #00e1ff1f;animation:fade .2s ease}
 .sheet h3{font:600 14px 'Space Grotesk';color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin:20px 0 6px}.sheet li{margin:5px 0}.sheet .x{position:absolute;right:14px;top:14px;padding:6px 10px}
@@ -199,6 +205,11 @@ textarea{resize:vertical;min-height:80px}.formrow{display:grid;grid-template-col
   </div>
 </section>
 </div></main></div>
+<div class="tmr" id="tmr"><div class="tbox"><div class="eyebrow" id="tTitle"></div><div class="tphase" id="tPhase"></div>
+<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" class="rbg"/><circle id="rfg" cx="60" cy="60" r="54" class="rfg"/></svg><div id="tClock"></div></div>
+<div id="tNext" class="muted"></div><div id="tMeta" class="muted small"></div>
+<div class="actions" style="justify-content:center;margin:18px 0 10px"><button class="btn" id="tBack">⏮ Back</button><button class="btn primary" id="tPause">Pause</button><button class="btn" id="tSkip">Skip ⏭</button><button class="btn danger" id="tStop">Stop</button></div>
+<label style="display:flex;gap:8px;justify-content:center;align-items:center;margin:0"><input type="checkbox" id="tVoice" checked style="width:auto"> Voice prompts</label></div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
@@ -260,11 +271,52 @@ const PLAN=[
  {day:'Sat',title:'Cricket',min:()=>360,gear:['Cricket kit','Water bottle','Sunscreen + hat','Food for after'],
   steps:()=>['Pre-game activation (10 min): jog, dynamic stretches, build-ups.','Drink regularly and eat during breaks.','After: easy walk, stretch, refuel and rest up for Sunday.'],tips:['If you feel flat on Sunday, shorten the long run.']}
 ];
+
+/* ---- interval timer: one set of phases per session ---- */
+const ph=(n,s,k)=>({n,s,k});
+const TIMERS=[
+ ()=>{const w=W(),h=w>=2?Math.min(6,w):0,m=Math.min(55,30+w*3),o=[ph('Warm-up walk + easy jog',300,'warm'),ph('Steady run',(m-5)*60,'rest'),ph('Pick up the pace',300,'work')];
+  for(let i=1;i<=h;i++)o.push(ph(`Hill rep ${i}/${h} — hard uphill`,35,'work'),ph('Walk back down',90,'rest'));o.push(ph('Cool-down walk + stretch',300,'cool'));return o},
+ ()=>{const w=W(),r=Math.min(8,4+Math.floor(w/2)),m=w<4?3:4,o=[ph('Warm-up jog + drills',480,'warm')];
+  for(let i=1;i<=r;i++){o.push(ph(`HARD ${i}/${r}`,m*60,'work'));if(i<r)o.push(ph('Easy jog',90,'rest'))}o.push(ph('Cool-down jog + stretch',300,'cool'));return o},
+ ()=>{const w=W(),r=Math.min(10,6+Math.floor(w/2)),o=[ph('Warm-up jog + build-ups',480,'warm')];
+  for(let i=1;i<=r;i++)o.push(ph(`SPRINT ${i}/${r} — 20 m, go!`,6,'work'),ph('Walk back and recover',75,'rest'));
+  for(let i=1;i<=3;i++){['Squat jumps','Bounds, alternate legs','Step or box jumps','Skater hops'].forEach(x=>o.push(ph(`${x} · round ${i}/3`,30,'work')));if(i<3)o.push(ph('Rest',90,'rest'))}
+  o.push(ph('Cool-down + stretch',300,'cool'));return o},
+ ()=>[ph('Warm-up before cricket',300,'warm'),ph('Stretch + mobility after futsal',600,'cool')],
+ ()=>{const r=Math.min(4,3+Math.floor(W()/4)),o=[ph('Warm-up',180,'warm')];
+  for(let i=1;i<=r;i++){[['Split squats (swap legs halfway)',45],['Single-leg RDL (swap halfway)',45],['Glute bridges',40],['Push-ups',40],['Calf raises',30]].forEach(([n,t])=>o.push(ph(`${n} · round ${i}/${r}`,t,'work')));if(i<r)o.push(ph('Rest',60,'rest'))}
+  o.push(ph('Plank',45,'work'),ph('Rest',15,'rest'),ph('Side plank — left',30,'work'),ph('Side plank — right',30,'work'),ph('Dead bugs',40,'work'),ph('Done — stretch',60,'cool'));return o},
+ ()=>[ph('Easy jog',180,'warm'),ph('Dynamic stretches',300,'warm'),ph('Build-ups: 3 × 20 m',120,'work')],
+ ()=>[ph('Easy jog',180,'warm'),ph('Dynamic stretches',300,'warm'),ph('Build-ups: 3 × 20 m',120,'work')]];
+let T=null,AC=null,WL=null;
+const tfmt=x=>{x=Math.max(0,Math.ceil(x));return Math.floor(x/60)+':'+p2(x%60)};
+function beep(f,d){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.25;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch{}}
+function say(t){if(!$('#tVoice').checked||!window.speechSynthesis)return;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t))}
+async function startTimer(i){$('#tPause').onclick=pauseToggle;const ph=TIMERS[i]();T={ph,idx:0,i,iv:setInterval(tick,200),paused:false};$('#tTitle').textContent=PLAN[i].title+' · Week '+(W()+1);$('#tmr').classList.add('show');
+ try{WL=await navigator.wakeLock?.request('screen')}catch{}goPhase(0)}
+function goPhase(n){if(n>=T.ph.length)return finishTimer();T.idx=Math.max(0,n);const p=T.ph[T.idx];T.left=p.s;T.end=Date.now()+p.s*1000;T.paused=false;T.sec=null;
+ $('#tPause').textContent='Pause';beep(880,.35);navigator.vibrate?.([200]);say(p.n);drawTimer()}
+function drawTimer(){const p=T.ph[T.idx],nx=T.ph[T.idx+1],left=T.paused?T.left:(T.end-Date.now())/1000;
+ $('#tmr').className='tmr show k-'+p.k;$('#tPhase').textContent=p.n;$('#tClock').textContent=tfmt(left);
+ $('#rfg').style.strokeDashoffset=339.3*(1-Math.max(0,left)/p.s);
+ $('#tNext').textContent=nx?'Next: '+nx.n+' ('+tfmt(nx.s)+')':'Last step';
+ $('#tMeta').textContent=`Step ${T.idx+1} of ${T.ph.length} · ${tfmt(left+T.ph.slice(T.idx+1).reduce((a,x)=>a+x.s,0))} left in session`}
+function tick(){if(!T||T.paused)return;const left=(T.end-Date.now())/1000;if(left<=0)return goPhase(T.idx+1);
+ const sec=Math.ceil(left);if(sec<=3&&sec!==T.sec&&T.ph[T.idx].s>6){beep(660,.12);navigator.vibrate?.([60])}T.sec=sec;drawTimer()}
+function pauseToggle(){if(!T)return;if(T.paused){T.end=Date.now()+T.left*1000;T.paused=false;$('#tPause').textContent='Pause'}else{T.left=(T.end-Date.now())/1000;T.paused=true;$('#tPause').textContent='Resume'}drawTimer()}
+$('#tPause').onclick=pauseToggle;
+$('#tSkip').onclick=()=>T&&goPhase(T.idx+1);$('#tBack').onclick=()=>T&&goPhase(T.idx-1);
+$('#tStop').onclick=()=>{if(T&&confirm('Stop this session?'))endTimer()};
+function endTimer(){if(T)clearInterval(T.iv);T=null;speechSynthesis?.cancel();try{WL?.release()}catch{}$('#tmr').className='tmr'}
+function finishTimer(){clearInterval(T.iv);const t=PLAN[T.i].title;[880,1100,1320].forEach((f,k)=>setTimeout(()=>beep(f,.3),k*300));say('Session complete. Great work.');
+ $('#tmr').className='tmr show k-cool';$('#tPhase').textContent='Session complete 🎉';$('#tClock').textContent='✓';$('#rfg').style.strokeDashoffset=0;$('#tNext').textContent=t+' — done. Log your run or sprints in the tracker.';$('#tMeta').textContent='';T.paused=true;T.fin=1;
+ $('#tPause').textContent='Close';$('#tPause').onclick=endTimer}
 function openSession(i){const p=PLAN[i],w=W();
  $('#sheet').innerHTML=`<button class="btn x" id="mx">✕</button><div class="eyebrow">${p.day} · Week ${w+1}</div><h2 class="heading" style="margin:4px 0 8px">${p.title}</h2><span class="tag">~${p.min()} min</span> <span class="tag">${SOLO.slice(0,-1)}</span>
- <h3>Equipment you need</h3><ul>${p.gear.map(g=>`<li>${g}</li>`).join('')}</ul><h3>The session</h3><ol>${p.steps().map(x=>`<li>${x}</li>`).join('')}</ol><h3>Tips</h3><ul>${p.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+ <p style="margin:16px 0 0"><button class="btn primary" id="tstart" style="width:100%;padding:14px">▶ Start interval timer</button></p><h3>Equipment you need</h3><ul>${p.gear.map(g=>`<li>${g}</li>`).join('')}</ul><h3>The session</h3><ol>${p.steps().map(x=>`<li>${x}</li>`).join('')}</ol><h3>Tips</h3><ul>${p.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
  <p class="muted small">Stop and rest if you feel sharp pain, dizziness or unusual soreness. Miss a session rather than train through an injury.</p>`;
- $('#modal').classList.add('show');$('#mx').onclick=closeSession}
+ $('#modal').classList.add('show');$('#mx').onclick=closeSession;$('#tstart').onclick=()=>{closeSession();startTimer(i)}}
 function closeSession(){$('#modal').classList.remove('show')}
 if(!data.planStart){data.planStart=todayISO();save()}
 const planWeek=()=>Math.floor((new Date(todayISO())-new Date(data.planStart))/6048e5);
