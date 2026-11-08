@@ -1,456 +1,122 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b14">
+<meta name="theme-color" content="#050912">
 <meta name="description" content="Jarvis — your personal AI command centre.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jarvis">
-
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-
 <title>Jarvis — Personal AI</title>
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#070b14;
-  --sidebar:#090f1c;
-  --panel:#0d1727;
-  --panel2:#101e31;
-  --line:#1c2d43;
-  --text:#edf7ff;
-  --muted:#8297ad;
-  --cyan:#00d9ff;
-  --blue:#287bff;
-  --violet:#8e4de8;
-  --green:#43d99a;
-  --red:#ff7185;
-  --amber:#ffc36b;
-  --radius:18px;
-}
+:root{color-scheme:dark;--bg:#050912;--line:#1a2b42;--text:#eef8ff;--muted:#7f95ab;--cyan:#00e1ff;--blue:#2a7bff;--violet:#9055ff;--green:#43d99a;--red:#ff6f86;--amber:#ffc36b;--r:18px}
 *{box-sizing:border-box}
-html,body{
-  margin:0;
-  min-height:100%;
-  height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font:15px/1.55 "DM Sans",system-ui,sans-serif;
-}
-body{overflow:hidden}
-button,input,textarea,select{font:inherit;color:inherit}
-button{cursor:pointer}
-.app{
-  display:flex;
-  height:100dvh;
-  width:100%;
-  background:radial-gradient(ellipse at 65% -20%,#12314b66,transparent 55%),var(--bg);
-}
-aside{
-  width:250px;
-  flex:none;
-  background:#080e19ed;
-  border-right:1px solid var(--line);
-  padding:20px 14px;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  z-index:5;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:4px 4px 22px;
-  min-height:88px;
-}
-.brand img{
-  width:100%;
-  max-width:218px;
-  height:auto;
-  aspect-ratio:3/1;
-  object-fit:contain;
-  filter:drop-shadow(0 0 12px #00d9ff35);
-}
-.brand img.brand-fallback{
-  width:48px;
-  height:48px;
-  aspect-ratio:1;
-  align-self:flex-start;
-  margin-left:8px;
-}
-.nav{
-  border:1px solid transparent;
-  background:transparent;
-  color:var(--muted);
-  text-align:left;
-  padding:11px 13px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:15px/1.55 "DM Sans",system-ui,sans-serif}
+body{overflow:hidden}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+.app{display:flex;height:100dvh;position:relative;background:radial-gradient(ellipse at 70% -10%,#0f3a5a66,transparent 55%),radial-gradient(ellipse at 0% 100%,#2a1a5a40,transparent 50%),var(--bg)}
+.app:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at 60% 20%,#000,transparent 75%)}
+aside{width:244px;flex:none;background:#070d18ec;border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:6px;z-index:5;backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 8px 22px}
+.orb{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--cyan) 30%,var(--blue) 70%);box-shadow:0 0 22px #00e1ffaa,0 0 60px #2a7bff55;animation:pulse 3.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 30px #00e1ffff,0 0 80px #9055ff66;transform:scale(1.06)}}
+.brand b{font:700 21px "Space Grotesk";letter-spacing:.22em}
+.nav{border:1px solid transparent;background:none;color:var(--muted);text-align:left;padding:11px 13px;border-radius:12px;display:flex;gap:12px;align-items:center;transition:.15s}
 .nav:hover{background:#ffffff0a;color:var(--text)}
-.nav.active{
-  background:linear-gradient(100deg,#12314b,#10203b);
-  border-color:#1b5269;
-  color:#fff;
-  box-shadow:inset 3px 0 var(--cyan);
-}
-.nav .ico{width:21px;text-align:center;font-size:17px}
-.side-bottom{
-  margin-top:auto;
-  border-top:1px solid var(--line);
-  padding:15px 8px 0;
-  color:var(--muted);
-  font-size:12px;
-}
-.online{color:var(--green)}
-main{flex:1;min-width:0;display:flex;flex-direction:column}
-.topbar{
-  height:70px;
-  flex:none;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:0 28px;
-  border-bottom:1px solid #1c2d4380;
-  background:#080e1980;
-  backdrop-filter:blur(14px);
-}
-.topbar h1{font:600 20px "Space Grotesk";margin:0}
-.topbar .right{margin-left:auto;color:var(--muted);font-size:13px}
+.nav.active{background:linear-gradient(100deg,#0f3350,#10203b);border-color:#1b5269;color:#fff;box-shadow:inset 3px 0 var(--cyan),0 0 22px #00e1ff14}
+.ico{width:20px;text-align:center}
+.side-bottom{margin-top:auto;border-top:1px solid var(--line);padding:14px 8px 0;color:var(--muted);font-size:12px}
+main{flex:1;min-width:0;display:flex;flex-direction:column;z-index:1}
+.topbar{height:68px;flex:none;display:flex;align-items:center;gap:12px;padding:0 28px;border-bottom:1px solid #1a2b4380;background:#070d1880;backdrop-filter:blur(14px)}
+.topbar h1{font:600 20px "Space Grotesk";margin:0}.topbar .right{margin-left:auto;color:var(--muted);font-size:13px}
 .menu{display:none}
-#content{
-  overflow:auto;
-  flex:1;
-  padding:28px;
-  max-width:1500px;
-  width:100%;
-  margin:0 auto;
-}
-.view{display:none}
-.view.active{display:block;animation:fade .2s ease}
-@keyframes fade{from{opacity:0;transform:translateY(5px)}}
-.eyebrow{
-  color:var(--cyan);
-  font-size:11px;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  font-weight:700;
-}
-.heading{
-  font:600 clamp(25px,4vw,36px) "Space Grotesk";
-  margin:5px 0;
-}
-.sub{color:var(--muted);margin:0 0 22px}
-.grid{display:grid;gap:15px}
-.grid.stats{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  margin:22px 0;
-}
-.grid.two{grid-template-columns:1.2fr .8fr}
-.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.card{
-  background:linear-gradient(145deg,#0e192a,#0b1422);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:19px;
-  box-shadow:0 12px 35px #00000015;
-  min-width:0;
-}
-.card h2,.card h3{
-  font:600 16px "Space Grotesk";
-  margin:0 0 13px;
-}
-.stat{font:700 29px "Space Grotesk";margin:4px 0}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.hero{
-  position:relative;
-  overflow:hidden;
-  padding:28px;
-  background:linear-gradient(115deg,#0e2336,#11172b 65%,#20153b);
-  border:1px solid #23455d;
-  border-radius:22px;
-}
-.hero:after{
-  content:"";
-  position:absolute;
-  width:250px;
-  height:250px;
-  border:1px solid #00d9ff35;
-  border-radius:50%;
-  right:-75px;
-  top:-110px;
-  box-shadow:0 0 0 22px #00d9ff08,0 0 0 48px #00d9ff06;
-}
-.hero h2{
-  font:600 clamp(26px,4vw,38px) "Space Grotesk";
-  margin:8px 0;
-}
-.hero p{color:#a5bdd0;max-width:580px;margin:0 0 18px}
-.btn{
-  border:1px solid var(--line);
-  background:#132237;
-  border-radius:11px;
-  padding:10px 14px;
-}
-.btn:hover{border-color:var(--cyan)}
-.btn.primary{
-  background:linear-gradient(110deg,#087f9e,#245ed0);
-  border:0;
-  color:white;
-  font-weight:700;
-}
-.btn.danger{color:var(--red)}
-.btn.ghost{background:transparent}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+#content{overflow:auto;flex:1;padding:28px;max-width:1400px;width:100%;margin:0 auto}
+.view{display:none}.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+.heading{font:600 clamp(25px,4vw,34px) "Space Grotesk";margin:5px 0}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;gap:15px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin:20px 0}.two{grid-template-columns:1.2fr .8fr}
+.card{background:linear-gradient(145deg,#0e1a2bd9,#0a1220d9);border:1px solid var(--line);border-radius:var(--r);padding:19px;min-width:0;backdrop-filter:blur(8px);transition:.2s}
+.card:hover{border-color:#25496a}
+.card h2{font:600 16px "Space Grotesk";margin:0 0 13px}
+.stat{font:700 28px "Space Grotesk";margin:3px 0;background:linear-gradient(90deg,#fff,#9fe9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.muted{color:var(--muted)}.small{font-size:12px}
+.hero{position:relative;overflow:hidden;padding:30px;background:linear-gradient(115deg,#0c2a42,#10172b 60%,#25164a);border:1px solid #24506a;border-radius:22px}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border:1px solid #00e1ff40;border-radius:50%;right:-70px;top:-100px;box-shadow:0 0 0 24px #00e1ff0a,0 0 0 54px #00e1ff07;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero h2{font:600 clamp(26px,4vw,38px) "Space Grotesk";margin:8px 0}.hero p{color:#a5bdd0;max-width:560px;margin:0 0 18px}
+.btn{border:1px solid var(--line);background:#12213a;border-radius:11px;padding:10px 14px;transition:.15s}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 16px #00e1ff22}
+.btn.primary{background:linear-gradient(110deg,#0891b2,#2a5fe0,#6a3fe0);border:0;color:#fff;font-weight:700}
+.btn.danger{color:var(--red)}.btn.ghost{background:none}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.on{border-color:var(--cyan);color:var(--cyan)}
 .actions{display:flex;gap:9px;flex-wrap:wrap}
-.quick{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
-  margin-top:15px;
-}
-.quick button{text-align:left;min-height:88px}
-.quick b{display:block;margin-bottom:4px}
-.quick span{color:var(--muted);font-size:12px}
+.quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}
+.quick button{text-align:left;min-height:84px}.quick b{display:block;margin-bottom:4px}.quick span{color:var(--muted);font-size:12px}
 label{display:block;color:var(--muted);font-size:12px;margin:12px 0 5px}
-input,textarea,select{
-  width:100%;
-  background:#081321;
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:11px 12px;
-  outline:none;
-}
-input:focus,textarea:focus,select:focus{
-  border-color:var(--cyan);
-  box-shadow:0 0 0 3px #00d9ff12;
-}
-textarea{resize:vertical;min-height:90px}
-.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.list{display:flex;flex-direction:column;gap:9px}
-.item{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:11px 0;
-  border-bottom:1px solid #1c2d4380;
-}
-.item:last-child{border-bottom:0}
-.item-main{flex:1;min-width:0}
-.item-title{font-weight:600}
-.item-meta{font-size:12px;color:var(--muted)}
-.item-actions{display:flex;gap:5px}
-.item-actions button{padding:5px 8px;font-size:12px}
-.tag{
-  display:inline-block;
-  border:1px solid #28516a;
-  background:#10263a;
-  color:#83eaff;
-  border-radius:99px;
-  padding:2px 8px;
-  font-size:11px;
-}
-.google-tag{
-  display:inline-block;
-  border:1px solid #32614d;
-  background:#102b22;
-  color:#75e6ad;
-  border-radius:99px;
-  padding:2px 8px;
-  font-size:11px;
-  margin-top:5px;
-}
-.calendar-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.calendar-head h2{
-  margin:0;
-  flex:1;
-  text-align:center;
-  font:600 19px "Space Grotesk";
-}
-.monthgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.weekday{text-align:center;color:var(--muted);font-size:11px;padding:6px 0}
-.day{
-  min-height:75px;
-  background:#091524;
-  border:1px solid #1b2a3e;
-  border-radius:10px;
-  text-align:left;
-  padding:7px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-.day.out{opacity:.35}
-.day.today{border-color:var(--cyan)}
-.day.selected{background:#102a40;border-color:#2786a3}
-.day .num{font-size:12px}
-.day .eventdot{
-  font-size:10px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  color:#83eaff;
-  background:#0d3443;
-  padding:2px 4px;
-  border-radius:4px;
-}
-.day .google-dot{color:#75e6ad;background:#123528}
-#chatMessages{
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-  min-height:300px;
-  max-height:calc(100dvh - 260px);
-  overflow:auto;
-  padding:4px 2px 14px;
-}
-.message{
-  max-width:min(85%,780px);
-  padding:12px 15px;
-  border-radius:16px;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-}
-.message.user{align-self:flex-end;background:#12365a;border:1px solid #1c5678}
-.message.assistant{align-self:flex-start;background:#0a1422;border:1px solid var(--line)}
-.message strong{color:#9defff}
-.chatform{display:flex;gap:8px;align-items:flex-end}
-.chatform textarea{min-height:48px;max-height:140px;resize:vertical}
-.chatform button{height:48px}
-.empty{color:var(--muted);font-size:13px;padding:12px 0}
-.check{width:18px;height:18px;accent-color:var(--cyan);margin-top:3px}
-.done .item-title{text-decoration:line-through;opacity:.55}
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:24px;
-  transform:translate(-50%,20px);
-  opacity:0;
-  pointer-events:none;
-  background:#102337;
-  border:1px solid #2a6681;
-  padding:10px 16px;
-  border-radius:12px;
-  z-index:30;
-  transition:.2s;
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.mobile-scrim{display:none}
-@media(max-width:950px){
-  .grid.stats{grid-template-columns:repeat(2,1fr)}
-  .grid.two{grid-template-columns:1fr}
-}
-@media(max-width:720px){
-  body{overflow:hidden}
-  aside{
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:min(290px,85vw);
-    transform:translateX(-102%);
-    transition:.2s;
-    box-shadow:20px 0 50px #0008;
-  }
-  aside.open{transform:translateX(0)}
-  .mobile-scrim.show{
-    display:block;
-    position:fixed;
-    inset:0;
-    background:#0009;
-    z-index:4;
-  }
-  .menu{display:inline-block}
-  .topbar{height:62px;padding:0 15px}
-  #content{padding:17px 14px 35px}
-  .quick{grid-template-columns:1fr 1fr}
-  .grid.three{grid-template-columns:1fr}
-  .day{min-height:58px;padding:5px}
-  .day .eventdot{display:none}
-  .hero{padding:22px}
-  .formrow{grid-template-columns:1fr}
-}
-@media(max-width:390px){
-  .grid.stats{grid-template-columns:1fr 1fr}
-  .quick{grid-template-columns:1fr}
-  .message{max-width:94%}
-}
-</style>
-</head>
-
-<body>
-<div class="app">
-
+input,textarea,select{width:100%;background:#071221;border:1px solid var(--line);border-radius:11px;padding:11px 12px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00e1ff14}
+textarea{resize:vertical;min-height:80px}.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid #1a2b4380}.item:last-child{border:0}
+.item-main{flex:1;min-width:0}.item-title{font-weight:600}.item-meta{font-size:12px;color:var(--muted)}
+.item-actions{display:flex;gap:5px}.item-actions button{padding:5px 9px;font-size:12px}
+.tag{display:inline-block;border:1px solid #28516a;background:#10263a;color:#83eaff;border-radius:99px;padding:2px 9px;font-size:11px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:14px}.head h2{margin:0;flex:1;text-align:center}
+.mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.wd{text-align:center;color:var(--muted);font-size:11px;padding:6px 0}
+.day{min-height:76px;background:#081322;border:1px solid #1a2a3e;border-radius:10px;text-align:left;padding:7px;display:flex;flex-direction:column;gap:4px;transition:.15s}
+.day:hover{border-color:#2d5a7a}.day.out{opacity:.35}.day.today{border-color:var(--cyan);box-shadow:0 0 14px #00e1ff22}.day.sel{background:#102a40;border-color:#2786a3}
+.dot{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#83eaff;background:#0d3443;padding:2px 5px;border-radius:5px}
+#chatMessages{display:flex;flex-direction:column;gap:13px;min-height:300px;max-height:calc(100dvh - 270px);overflow:auto;padding:4px 2px 14px}
+.message{max-width:min(85%,780px);padding:12px 15px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.message.user{align-self:flex-end;background:#12365a;border:1px solid #1c5678}.message.assistant{align-self:flex-start;background:#091322;border:1px solid var(--line)}
+.chatform{display:flex;gap:8px;align-items:flex-end}.chatform textarea{min-height:48px;max-height:140px}.chatform button{height:48px}
+.empty{color:var(--muted);font-size:13px;padding:12px 0}.check{width:18px;height:18px;accent-color:var(--cyan);margin-top:3px}.done .item-title{text-decoration:line-through;opacity:.5}
+.bars{display:flex;align-items:flex-end;gap:8px;height:130px;padding-top:8px}.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:5px}
+.bar i{width:100%;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--cyan),var(--blue));min-height:3px;box-shadow:0 0 14px #00e1ff33}.bar span{font-size:10px;color:var(--muted)}
+.plan .item.now{background:#0f2a40;border-radius:10px;padding-left:10px;border:1px solid #1f5a78}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102337;border:1px solid #2a6681;padding:10px 16px;border-radius:12px;z-index:30;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.scrim{display:none}
+@media(max-width:950px){.stats{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
+@media(max-width:720px){aside{position:fixed;inset:0 auto 0 0;width:min(290px,85vw);transform:translateX(-102%);transition:.2s}aside.open{transform:none}
+.scrim.show{display:block;position:fixed;inset:0;background:#0009;z-index:4}.menu{display:inline-block}.topbar{padding:0 15px}#content{padding:17px 14px 35px}
+.quick{grid-template-columns:1fr}.day{min-height:56px;padding:5px}.dot{display:none}.formrow{grid-template-columns:1fr}.hero{padding:22px}}
+</style></head>
+<body><div class="app">
 <aside id="sidebar">
-  <div class="brand">
-    <img class="brand-logo" src="/jarvis-logo.svg"
-      alt="Jarvis — Artificial Intelligence Interface"
-      onerror="this.onerror=null;this.src='/icons/icon.svg';this.classList.add('brand-fallback')">
-  </div>
-
+  <div class="brand"><div class="orb"></div><b>JARVIS</b></div>
   <button class="nav active" data-view="home"><span class="ico">⌂</span>Overview</button>
   <button class="nav" data-view="chat"><span class="ico">✧</span>AI Assistant</button>
   <button class="nav" data-view="calendar"><span class="ico">▦</span>Calendar</button>
   <button class="nav" data-view="tasks"><span class="ico">✓</span>Tasks</button>
-  <button class="nav" data-view="training"><span class="ico">ϟ</span>Training</button>
+  <button class="nav" data-view="training"><span class="ico">ϟ</span>Running &amp; Fitness</button>
   <button class="nav" data-view="settings"><span class="ico">⚙</span>Settings</button>
-
-  <div class="side-bottom">
-    <span class="online">●</span> Local-first workspace<br>
-    <span id="sideDate"></span>
-  </div>
+  <div class="side-bottom"><span style="color:var(--green)">●</span> Local-first workspace<br><span id="sideDate"></span></div>
 </aside>
-
-<div class="mobile-scrim" id="scrim"></div>
-
+<div class="scrim" id="scrim"></div>
 <main>
-<header class="topbar">
-  <button class="btn menu" id="menu" aria-label="Open menu">☰</button>
-  <h1 id="pageTitle">Overview</h1>
-  <div class="right" id="topDate"></div>
-</header>
-
+<header class="topbar"><button class="btn menu" id="menu" aria-label="Menu">☰</button><h1 id="pageTitle">Overview</h1><div class="right" id="topDate"></div></header>
 <div id="content">
 
 <section class="view active" id="view-home">
-  <div class="hero">
-    <div class="eyebrow">YOUR PERSONAL COMMAND CENTRE</div>
-    <h2 id="greeting">Good day.</h2>
-    <p>Plan your day, keep track of what matters and use your AI assistant to think things through. Connect Google Calendar to see your existing schedule.</p>
-    <div class="actions">
-      <button class="btn primary" data-open="chat">Talk to Jarvis ↗</button>
-      <button class="btn" data-open="calendar">View calendar</button>
-    </div>
-  </div>
-
+  <div class="hero"><div class="eyebrow">Your personal command centre</div><h2 id="greeting">Good day.</h2>
+  <p>Your schedule, tasks and running plan in one place. Tell Jarvis what to add to your calendar and it does it for you.</p>
+  <div class="actions"><button class="btn primary" data-open="chat">Talk to Jarvis ↗</button><button class="btn" data-open="calendar">View calendar</button></div></div>
   <div class="grid stats">
-    <div class="card"><div class="muted small">Events today</div><div class="stat" id="statEvents">0</div><div class="muted small">On your calendar</div></div>
-    <div class="card"><div class="muted small">Open tasks</div><div class="stat" id="statTasks">0</div><div class="muted small">Still to do</div></div>
-    <div class="card"><div class="muted small">Completed tasks</div><div class="stat" id="statDone">0</div><div class="muted small">All time</div></div>
-    <div class="card"><div class="muted small">Next event</div><div class="stat" style="font-size:18px" id="statNext">Nothing planned</div><div class="muted small" id="statNextTime">Add an event to get started</div></div>
+    <div class="card"><div class="muted small">Events today</div><div class="stat" id="statEvents">0</div></div>
+    <div class="card"><div class="muted small">Open tasks</div><div class="stat" id="statTasks">0</div></div>
+    <div class="card"><div class="muted small">Km this week</div><div class="stat" id="statKm">0</div></div>
+    <div class="card"><div class="muted small">Next up</div><div class="stat" style="font-size:17px;-webkit-text-fill-color:#fff" id="statNext">Nothing planned</div><div class="muted small" id="statNextTime"></div></div>
   </div>
-
   <div class="quick">
-    <button class="card" data-prompt="Give me a practical plan for today using my calendar and open tasks."><b>◷ Daily briefing</b><span>Get a clear plan for today.</span></button>
-    <button class="card" data-prompt="Help me prioritise my open tasks. Tell me what to do first and why."><b>◎ Prioritise tasks</b><span>Work out what matters most.</span></button>
-    <button class="card" data-prompt="Help me plan my week around my existing events."><b>✧ Plan my week</b><span>Make the week manageable.</span></button>
+    <button class="card" data-prompt="Give me a practical plan for today using my calendar, tasks and running plan."><b>◷ Daily briefing</b><span>A clear plan for today.</span></button>
+    <button class="card" data-prompt="Help me prioritise my open tasks. Tell me what to do first and why."><b>◎ Prioritise tasks</b><span>What matters most.</span></button>
+    <button class="card" data-prompt="Look at my week and tell me how my running and training fits around my events."><b>ϟ Check my training</b><span>Fit running around sport.</span></button>
   </div>
-
   <div class="grid two" style="margin-top:16px">
     <div class="card"><h2>Today's schedule</h2><div id="todayEvents" class="list"></div></div>
     <div class="card"><h2>Tasks to focus on</h2><div id="todayTasks" class="list"></div></div>
@@ -458,1593 +124,246 @@ textarea{resize:vertical;min-height:90px}
 </section>
 
 <section class="view" id="view-chat">
-  <div class="eyebrow">JARVIS AI</div>
-  <h2 class="heading">What can I help with?</h2>
-  <p class="sub">Jarvis can use your connected Google Calendar, tasks and training information to help organise your schedule.</p>
-
-  <div class="card">
-    <div id="chatMessages">
-      <div class="message assistant">Hello. I'm Jarvis. I can help you plan, organise, think through decisions and get things done. What do you need?</div>
-    </div>
-    <form class="chatform" id="chatForm">
-      <textarea id="chatInput" rows="1" placeholder="Message Jarvis…"></textarea>
-      <button class="btn primary" id="sendBtn">Send ↗</button>
-    </form>
-    <p class="muted small" style="margin:10px 0 0">AI responses can be wrong. Check important dates and decisions yourself.</p>
-  </div>
+  <div class="eyebrow">Jarvis AI</div><h2 class="heading">What can I help with?</h2>
+  <p class="sub">Try: “add soccer training every Tuesday at 4pm for the next 4 weeks”.</p>
+  <div class="card"><div id="chatMessages"><div class="message assistant">Hello. I'm Jarvis. I can plan your days, manage your calendar and tasks, and help with your running. What do you need?</div></div>
+  <form class="chatform" id="chatForm"><textarea id="chatInput" rows="1" placeholder="Message Jarvis…"></textarea><button class="btn primary" id="sendBtn">Send ↗</button></form>
+  <p class="muted small" style="margin:10px 0 0">AI can be wrong. Check important dates yourself.</p></div>
 </section>
 
 <section class="view" id="view-calendar">
-  <div class="eyebrow">YOUR SCHEDULE</div>
-  <h2 class="heading">Calendar</h2>
-  <p class="sub">View your Google Calendar events alongside your local Jarvis events. Ask Jarvis to create new commitments through chat.</p>
-
+  <div class="eyebrow">Your schedule</div><h2 class="heading">Calendar</h2>
+  <p class="sub">Your week is pre-filled — edit anything that's off. Ask Jarvis in chat to add or change events.</p>
   <div class="grid two">
-    <div class="card">
-      <div class="calendar-head">
-        <button class="btn" id="prevMonth">‹</button>
-        <h2 id="monthLabel"></h2>
-        <button class="btn" id="nextMonth">›</button>
-        <button class="btn" id="goToday">Today</button>
-      </div>
-      <div class="monthgrid" id="calendarGrid"></div>
-    </div>
-
-    <div class="card">
-      <h2 id="selectedDateLabel">Selected day</h2>
-      <div id="selectedEvents" class="list"></div>
-      <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
-
-      <h2 id="eventFormTitle">Add local event</h2>
-      <p class="muted small">Events added here are saved in Jarvis on this device. Connect Google Calendar below to manage events through Google.</p>
-      <input type="hidden" id="eventId">
-
-      <label for="eventTitle">Event name</label>
-      <input id="eventTitle" maxlength="100" placeholder="e.g. Cricket training">
-
-      <div class="formrow">
-        <div><label for="eventStart">Starts</label><input id="eventStart" type="datetime-local"></div>
-        <div><label for="eventEnd">Ends</label><input id="eventEnd" type="datetime-local"></div>
-      </div>
-
-      <label for="eventLocation">Location (optional)</label>
-      <input id="eventLocation" maxlength="120" placeholder="Where?">
-
-      <label for="eventNotes">Notes (optional)</label>
-      <input id="eventNotes" maxlength="250" placeholder="Anything to remember">
-
-      <div class="actions" style="margin-top:14px">
-        <button class="btn primary" id="saveEvent" type="button">Save local event</button>
-        <button class="btn ghost" id="cancelEvent" type="button">Clear</button>
-      </div>
-    </div>
+    <div class="card"><div class="head"><button class="btn" id="prevMonth">‹</button><h2 id="monthLabel"></h2><button class="btn" id="nextMonth">›</button><button class="btn" id="goToday">Today</button></div><div class="mg" id="calendarGrid"></div></div>
+    <div class="card"><h2 id="selectedDateLabel"></h2><div id="selectedEvents" class="list"></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:15px 0"><h2 id="eventFormTitle">Add event</h2><input type="hidden" id="eventId">
+      <label for="eventTitle">Event name</label><input id="eventTitle" maxlength="100" placeholder="e.g. Cricket training">
+      <div class="formrow"><div><label for="eventStart">Starts</label><input id="eventStart" type="datetime-local"></div><div><label for="eventEnd">Ends</label><input id="eventEnd" type="datetime-local"></div></div>
+      <label for="eventLocation">Location</label><input id="eventLocation" maxlength="120">
+      <label for="eventNotes">Notes</label><input id="eventNotes" maxlength="250">
+      <div class="actions" style="margin-top:14px"><button class="btn primary" id="saveEvent" type="button">Save event</button><button class="btn ghost" id="cancelEvent" type="button">Clear</button></div></div>
   </div>
-
-  <div class="card" style="margin-top:15px">
-    <h2>Coming up</h2>
-    <div id="upcomingEvents" class="list"></div>
-  </div>
+  <div class="card" style="margin-top:15px"><h2>Coming up</h2><div id="upcomingEvents" class="list"></div></div>
 </section>
 
 <section class="view" id="view-tasks">
-  <div class="eyebrow">STAY ON TOP OF IT</div>
-  <h2 class="heading">Tasks</h2>
-  <p class="sub">Capture what needs doing, set a due date and tick it off when it's finished.</p>
-
+  <div class="eyebrow">Stay on top of it</div><h2 class="heading">Tasks</h2><p class="sub">Capture what needs doing and tick it off.</p>
   <div class="grid two">
-    <div class="card">
-      <h2>Add a task</h2>
-      <label for="taskTitle">Task</label>
-      <input id="taskTitle" maxlength="140" placeholder="What needs doing?">
-
-      <div class="formrow">
-        <div><label for="taskDue">Due date</label><input id="taskDue" type="date"></div>
-        <div>
-          <label for="taskPriority">Priority</label>
-          <select id="taskPriority">
-            <option value="Normal">Normal</option>
-            <option value="High">High</option>
-            <option value="Low">Low</option>
-          </select>
-        </div>
-      </div>
-
-      <label for="taskCategory">Category</label>
-      <input id="taskCategory" maxlength="35" placeholder="School, sport, personal…">
-      <button class="btn primary" id="addTask" style="margin-top:14px">Add task</button>
-    </div>
-
-    <div class="card">
-      <h2>Task list</h2>
-      <div class="actions" style="margin-bottom:12px">
-        <button class="btn" data-filter="all">All</button>
-        <button class="btn" data-filter="open">Open</button>
-        <button class="btn" data-filter="done">Completed</button>
-      </div>
-      <div id="taskList" class="list"></div>
-    </div>
+    <div class="card"><h2>Add a task</h2><label for="taskTitle">Task</label><input id="taskTitle" maxlength="140" placeholder="What needs doing?">
+      <div class="formrow"><div><label for="taskDue">Due date</label><input id="taskDue" type="date"></div><div><label for="taskPriority">Priority</label><select id="taskPriority"><option>Normal</option><option>High</option><option>Low</option></select></div></div>
+      <label for="taskCategory">Category</label><input id="taskCategory" maxlength="35" placeholder="School, sport, personal…"><button class="btn primary" id="addTask" style="margin-top:14px">Add task</button></div>
+    <div class="card"><h2>Task list</h2><div class="actions" style="margin-bottom:12px"><button class="btn" data-filter="all">All</button><button class="btn" data-filter="open">Open</button><button class="btn" data-filter="done">Completed</button></div><div id="taskList" class="list"></div></div>
   </div>
 </section>
 
 <section class="view" id="view-training">
-  <div class="eyebrow">PROGRESS TRACKER</div>
-  <h2 class="heading">Training log</h2>
-  <p class="sub">Record sessions and sprint times. Adjust your training to your sport load and recovery.</p>
-
-  <div class="grid two">
-    <div class="card">
-      <h2>Log a session</h2>
-      <label for="trainingName">Session</label>
-      <input id="trainingName" maxlength="100" placeholder="e.g. Soccer training">
-
-      <div class="formrow">
-        <div><label for="trainingDate">Date</label><input id="trainingDate" type="date"></div>
-        <div><label for="trainingDuration">Duration (minutes)</label><input id="trainingDuration" type="number" min="1" max="600" placeholder="60"></div>
-      </div>
-
-      <label for="trainingNotes">Notes</label>
-      <textarea id="trainingNotes" placeholder="How did it go?"></textarea>
-      <button class="btn primary" id="addTraining" style="margin-top:12px">Save session</button>
-    </div>
-
-    <div class="card">
-      <h2>Recent sessions</h2>
-      <div id="trainingList" class="list"></div>
-    </div>
+  <div class="eyebrow">Get fitter · get faster</div><h2 class="heading">Running &amp; Fitness</h2><p class="sub">Log runs, watch your pace drop and follow a plan built around soccer, cricket and futsal.</p>
+  <div class="grid stats">
+    <div class="card"><div class="muted small">Km this week</div><div class="stat" id="tKm">0</div></div>
+    <div class="card"><div class="muted small">Total km</div><div class="stat" id="tTotal">0</div></div>
+    <div class="card"><div class="muted small">Best pace</div><div class="stat" id="tBest">–</div><div class="muted small">min/km</div></div>
+    <div class="card"><div class="muted small">Runs logged</div><div class="stat" id="tRuns">0</div></div>
   </div>
-
-  <div class="card" style="margin-top:15px">
-    <h2>Sprint tracker</h2>
-    <div class="formrow">
-      <div><label for="sprintDistance">Distance (metres)</label><input id="sprintDistance" type="number" min="1" placeholder="30"></div>
-      <div><label for="sprintTime">Time (seconds)</label><input id="sprintTime" type="number" min="0.1" step="0.01" placeholder="4.80"></div>
-    </div>
-    <button class="btn primary" id="addSprint" style="margin-top:12px">Log sprint</button>
-    <div id="sprintList" class="list" style="margin-top:12px"></div>
+  <div class="grid two">
+    <div class="card"><h2>Log a run</h2>
+      <div class="formrow"><div><label for="runDate">Date</label><input id="runDate" type="date"></div><div><label for="runType">Type</label><select id="runType"><option>Easy run</option><option>Tempo</option><option>Intervals</option><option>Sprints</option><option>Long run</option></select></div></div>
+      <div class="formrow"><div><label for="runKm">Distance (km)</label><input id="runKm" type="number" min="0.1" step="0.01" placeholder="2.5"></div><div><label for="runMin">Time (minutes)</label><input id="runMin" type="number" min="1" step="0.01" placeholder="15"></div></div>
+      <button class="btn primary" id="addRun" style="margin-top:14px">Save run</button>
+      <h2 style="margin-top:22px">Km per week</h2><div class="bars" id="runBars"></div></div>
+    <div class="card plan"><h2>Your weekly plan</h2><div id="planList" class="list"></div><p class="muted small" id="planNote"></p></div>
+  </div>
+  <div class="grid two" style="margin-top:15px">
+    <div class="card"><h2>Recent runs</h2><div id="runList" class="list"></div></div>
+    <div class="card"><h2>Sprint tracker</h2>
+      <div class="formrow"><div><label for="sprintDistance">Distance (m)</label><input id="sprintDistance" type="number" min="1" placeholder="30"></div><div><label for="sprintTime">Time (s)</label><input id="sprintTime" type="number" min="0.1" step="0.01" placeholder="4.80"></div></div>
+      <button class="btn primary" id="addSprint" style="margin:12px 0">Log sprint</button><div id="sprintList" class="list"></div></div>
   </div>
 </section>
 
 <section class="view" id="view-settings">
-  <div class="eyebrow">PREFERENCES</div>
-  <h2 class="heading">Settings</h2>
-  <p class="sub">Personalise Jarvis and manage your connections and local data.</p>
-
+  <div class="eyebrow">Preferences</div><h2 class="heading">Settings</h2><p class="sub">Personalise Jarvis and manage your data.</p>
   <div class="grid two">
-    <div class="card">
-      <h2>Your profile</h2>
-      <label for="displayName">Display name</label>
-      <input id="displayName" maxlength="35" placeholder="Your name">
-
-      <label for="assistantTone">Assistant style</label>
-      <select id="assistantTone">
-        <option value="direct">Direct and practical</option>
-        <option value="detailed">Detailed explanations</option>
-        <option value="concise">Very concise</option>
-      </select>
-
-      <button class="btn primary" id="saveSettings" style="margin-top:14px">Save settings</button>
-    </div>
-
-    <div class="card">
-      <h2>AI connection</h2>
-      <p class="muted small">The Groq API key is stored in Vercel, not here. Add it under Project → Settings → Environment Variables.</p>
-      <div class="tag">Server-side key protection</div>
-      <p class="muted small" style="margin-top:12px">Environment variable name: <strong>GROQ_API_KEY</strong></p>
-      <p class="muted small">Default model: <strong>openai/gpt-oss-20b</strong>.</p>
-      <button class="btn" id="testAI">Test AI connection</button>
-      <p id="aiStatus" class="muted small" style="margin-top:9px">Not tested yet.</p>
-    </div>
-
-    <div class="card">
-      <h2>Google Calendar</h2>
-      <p class="muted small">Connect your Google account to read existing events and let Jarvis create events directly in your primary Google Calendar.</p>
-      <div class="actions">
-        <button class="btn primary" id="googleConnect">Connect Google Calendar</button>
-        <button class="btn" id="googleSync" disabled>Sync calendar</button>
-        <button class="btn danger" id="googleDisconnect" disabled>Disconnect</button>
-      </div>
-      <p id="googleStatus" class="muted small" style="margin-top:12px">Not connected.</p>
-      <p class="muted small">Google access is held in memory by this browser. You may need to reconnect after refreshing Jarvis.</p>
-    </div>
-
-    <div class="card">
-      <h2>Install Jarvis</h2>
-      <p class="muted small">On supported browsers, use the browser menu and choose Install app or Add to Home screen.</p>
-      <button class="btn" id="installBtn" hidden>Install Jarvis</button>
-      <p class="muted small">If the install button is unavailable, use Chrome's ⋮ menu → Save and share → Create shortcut.</p>
-    </div>
-
-    <div class="card">
-      <h2>Your data</h2>
-      <p class="muted small">Local events, tasks, training logs and preferences are saved in this browser on this device.</p>
-      <div class="actions">
-        <button class="btn" id="exportData">Export backup</button>
-        <button class="btn" id="importData">Import backup</button>
-        <button class="btn danger" id="eraseData">Erase all data</button>
-        <input type="file" id="importFile" accept="application/json" hidden>
-      </div>
-    </div>
+    <div class="card"><h2>Your profile</h2><label for="displayName">Display name</label><input id="displayName" maxlength="35">
+      <label for="assistantTone">Assistant style</label><select id="assistantTone"><option value="direct">Direct and practical</option><option value="detailed">Detailed explanations</option><option value="concise">Very concise</option></select>
+      <button class="btn primary" id="saveSettings" style="margin-top:14px">Save settings</button></div>
+    <div class="card"><h2>AI connection</h2><p class="muted small">The Groq key lives in Vercel (<strong>GROQ_API_KEY</strong>), never in this page.</p><div class="tag">Server-side key</div>
+      <p><button class="btn" id="testAI">Test AI connection</button></p><p id="aiStatus" class="muted small">Not tested yet.</p></div>
+    <div class="card"><h2>Schedule</h2><p class="muted small">Re-add your usual weekly schedule (cricket, futsal, training) if you've deleted it. Existing events are kept.</p><button class="btn" id="reseed">Re-add weekly schedule</button></div>
+    <div class="card"><h2>Install Jarvis</h2><p class="muted small">Use your browser menu → Install app / Add to Home screen.</p><button class="btn" id="installBtn" hidden>Install Jarvis</button></div>
+    <div class="card"><h2>Your data</h2><p class="muted small">Everything is saved in this browser on this device.</p>
+      <div class="actions"><button class="btn" id="exportData">Export backup</button><button class="btn" id="importData">Import backup</button><button class="btn danger" id="eraseData">Erase all data</button><input type="file" id="importFile" accept="application/json" hidden></div></div>
   </div>
 </section>
-
-</div>
-</main>
-</div>
-
+</div></main></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
-/* =========================================================
-   CORE APP
-   ========================================================= */
-
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-
-const STORE = 'jarvis.workspace.v2';
-
-const GOOGLE_CLIENT_ID =
-  '408151295382-3l15db988rusf557dbca3fu41ddc73q4.apps.googleusercontent.com';
-
-const GOOGLE_SCOPE =
-  'https://www.googleapis.com/auth/calendar.events';
-
-const todayISO = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-};
-
-let data = {
-  name:'',
-  tone:'direct',
-  events:[],
-  tasks:[],
-  training:[],
-  sprints:[]
-};
-
-try {
-  data = {...data,...JSON.parse(localStorage.getItem(STORE)||'{}')};
-} catch {}
-
-if(!Array.isArray(data.events))data.events=[];
-if(!Array.isArray(data.tasks))data.tasks=[];
-if(!Array.isArray(data.training))data.training=[];
-if(!Array.isArray(data.sprints))data.sprints=[];
-
-const save = () => {
-  try {
-    localStorage.setItem(STORE,JSON.stringify(data));
-  } catch {
-    toast('Could not save. Your browser storage may be full.');
-  }
-};
-
-const esc = s => String(s??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
-}[c]));
-
-let toastTimer;
-
-function toast(msg) {
-  const t=$('#toast');
-  t.textContent=msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-const dateFmt = (s,opts={weekday:'short',day:'numeric',month:'short'}) =>
-  new Date(s+'T12:00:00').toLocaleDateString('en-AU',opts);
-
-const dtFmt = s => new Date(s).toLocaleString('en-AU',{
-  day:'numeric',
-  month:'short',
-  hour:'numeric',
-  minute:'2-digit'
-});
-
-/* =========================================================
-   GOOGLE CALENDAR CONNECTION
-   ========================================================= */
-
-let googleEvents=[];
-let googleAccessToken=null;
-let googleTokenExpiry=0;
-let googleTokenClient=null;
-
-function calendarEvents() {
-  return [...data.events,...googleEvents];
-}
-
-const eventsSorted = () =>
-  calendarEvents().sort((a,b)=>new Date(a.start)-new Date(b.start));
-
-function localDateTime(value) {
-  const d=new Date(value);
-
-  const pad=n=>String(n).padStart(2,'0');
-
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function googleEventToJarvis(event) {
-  const allDay=Boolean(event.start?.date);
-
-  return {
-    id:'google:'+event.id,
-    googleId:event.id,
-    source:'google',
-    title:event.summary||'Untitled event',
-    start:allDay
-      ?event.start.date+'T00:00'
-      :localDateTime(event.start.dateTime),
-    end:allDay
-      ?event.end.date+'T00:00'
-      :localDateTime(event.end.dateTime),
-    location:event.location||'',
-    notes:event.description||'',
-    allDay
-  };
-}
-
-function requestGoogleAccess() {
-  return new Promise((resolve,reject)=>{
-    if(!window.google?.accounts?.oauth2) {
-      reject(new Error(
-        'Google sign-in has not loaded. Refresh Jarvis and try again.'
-      ));
-      return;
-    }
-
-    // Create a fresh client for each request so every sign-in
-    // uses the correct callback.
-    googleTokenClient=google.accounts.oauth2.initTokenClient({
-      client_id:GOOGLE_CLIENT_ID,
-      scope:GOOGLE_SCOPE,
-      callback:response=>{
-        if(response.error) {
-          reject(new Error(
-            response.error_description||response.error
-          ));
-          return;
-        }
-
-        googleAccessToken=response.access_token;
-
-        googleTokenExpiry=
-          Date.now()+
-          (Number(response.expires_in||3600)*1000);
-
-        resolve(googleAccessToken);
-      },
-      error_callback:error=>{
-        reject(new Error(
-          error.message||'Google sign-in was cancelled or blocked.'
-        ));
-      }
-    });
-
-    googleTokenClient.requestAccessToken({
-      prompt:googleAccessToken?'':'consent'
-    });
-  });
-}
-
-function requireGoogleAccess() {
-  if(
-    !googleAccessToken||
-    Date.now()>=googleTokenExpiry-60000
-  ) {
-    throw new Error(
-      'Your Google connection has expired. Reconnect Google Calendar in Settings.'
-    );
-  }
-
-  return googleAccessToken;
-}
-
-async function googleApi(path,options={}) {
-  const token=requireGoogleAccess();
-
-  const response=await fetch(
-    'https://www.googleapis.com/calendar/v3'+path,
-    {
-      ...options,
-      headers:{
-        Authorization:'Bearer '+token,
-        'Content-Type':'application/json',
-        ...(options.headers||{})
-      }
-    }
-  );
-
-  const result=await response.json().catch(()=>({}));
-
-  if(!response.ok) {
-    throw new Error(
-      result.error?.message||
-      'Google Calendar request failed ('+response.status+').'
-    );
-  }
-
-  return result;
-}
-
-async function syncGoogleCalendar() {
-  const status=$('#googleStatus');
-
-  status.textContent='Syncing your Google Calendar…';
-  status.style.color='var(--muted)';
-
-  try {
-    requireGoogleAccess();
-
-    const now=new Date();
-    const from=new Date(now.getTime()-30*86400000);
-    const to=new Date(now.getTime()+365*86400000);
-
-    let pageToken=null;
-    const collected=[];
-
-    do {
-      const params=new URLSearchParams({
-        timeMin:from.toISOString(),
-        timeMax:to.toISOString(),
-        singleEvents:'true',
-        orderBy:'startTime',
-        maxResults:'2500'
-      });
-
-      if(pageToken)params.set('pageToken',pageToken);
-
-      const result=await googleApi(
-        '/calendars/primary/events?'+params.toString()
-      );
-
-      collected.push(...(result.items||[]));
-      pageToken=result.nextPageToken||null;
-
-    } while(pageToken);
-
-    googleEvents=collected
-      .filter(e=>
-        e.status!=='cancelled'&&
-        e.start&&
-        e.end
-      )
-      .map(googleEventToJarvis);
-
-    renderCalendar();
-    renderHome();
-
-    status.textContent=
-      `Connected. ${googleEvents.length} Google Calendar events loaded.`;
-
-    status.style.color='var(--green)';
-
-    $('#googleConnect').textContent='Reconnect Google Calendar';
-    $('#googleSync').disabled=false;
-    $('#googleDisconnect').disabled=false;
-
-    return true;
-
-  } catch(error) {
-    status.textContent='Calendar sync failed: '+error.message;
-    status.style.color='var(--red)';
-    return false;
-  }
-}
-
-$('#googleConnect').onclick=async()=>{
-  const status=$('#googleStatus');
-
-  status.textContent='Opening Google sign-in…';
-  status.style.color='var(--muted)';
-
-  try {
-    await requestGoogleAccess();
-
-    $('#googleConnect').textContent='Reconnect Google Calendar';
-
-    await syncGoogleCalendar();
-
-  } catch(error) {
-    status.textContent='Connection failed: '+error.message;
-    status.style.color='var(--red)';
-  }
-};
-
-$('#googleSync').onclick=syncGoogleCalendar;
-
-$('#googleDisconnect').onclick=()=>{
-  if(googleAccessToken&&window.google?.accounts?.oauth2) {
-    google.accounts.oauth2.revoke(googleAccessToken,()=>{});
-  }
-
-  googleAccessToken=null;
-  googleTokenExpiry=0;
-  googleEvents=[];
-  googleTokenClient=null;
-
-  $('#googleConnect').textContent='Connect Google Calendar';
-  $('#googleSync').disabled=true;
-  $('#googleDisconnect').disabled=true;
-
-  $('#googleStatus').textContent='Disconnected.';
-  $('#googleStatus').style.color='var(--muted)';
-
-  renderCalendar();
-  renderHome();
-
-  toast('Google Calendar disconnected.');
-};
-
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
-function showView(name) {
-  $$('.view').forEach(v=>
-    v.classList.toggle('active',v.id==='view-'+name)
-  );
-
-  $$('.nav').forEach(b=>
-    b.classList.toggle('active',b.dataset.view===name)
-  );
-
-  $('#pageTitle').textContent=({
-    home:'Overview',
-    chat:'AI Assistant',
-    calendar:'Calendar',
-    tasks:'Tasks',
-    training:'Training',
-    settings:'Settings'
-  })[name]||name;
-
-  $('#sidebar').classList.remove('open');
-  $('#scrim').classList.remove('show');
-
-  if(name==='chat') {
-    setTimeout(()=>$('#chatInput').focus(),80);
-  }
-
-  if(name==='calendar')renderCalendar();
-  if(name==='tasks')renderTasks();
-  if(name==='training')renderTraining();
-}
-
-$$('.nav').forEach(b=>
-  b.onclick=()=>showView(b.dataset.view)
-);
-
-$$('[data-open]').forEach(b=>
-  b.onclick=()=>showView(b.dataset.open)
-);
-
-$('#menu').onclick=()=>{
-  $('#sidebar').classList.add('open');
-  $('#scrim').classList.add('show');
-};
-
-$('#scrim').onclick=()=>{
-  $('#sidebar').classList.remove('open');
-  $('#scrim').classList.remove('show');
-};
-
-$$('[data-prompt]').forEach(b=>b.onclick=()=>{
-  showView('chat');
-  sendMessage(b.dataset.prompt);
-});
-
-/* =========================================================
-   CLOCK AND OVERVIEW
-   ========================================================= */
-
-function refreshClock() {
-  const n=new Date();
-
-  $('#topDate').textContent=n.toLocaleDateString('en-AU',{
-    weekday:'long',
-    day:'numeric',
-    month:'short'
-  });
-
-  $('#sideDate').textContent=n.toLocaleTimeString('en-AU',{
-    hour:'2-digit',
-    minute:'2-digit'
-  });
-
-  const h=n.getHours();
-
-  $('#greeting').textContent=
-    (h<12?'Good morning':h<18?'Good afternoon':'Good evening')+
-    (data.name?', '+data.name:'')+'.';
-}
-
-function renderHome() {
-  const today=todayISO();
-
-  const ev=eventsSorted().filter(e=>
-    e.start.slice(0,10)===today
-  );
-
-  const open=data.tasks.filter(t=>!t.done);
-  const done=data.tasks.filter(t=>t.done);
-
-  $('#statEvents').textContent=ev.length;
-  $('#statTasks').textContent=open.length;
-  $('#statDone').textContent=done.length;
-
-  const next=eventsSorted().find(e=>
-    new Date(e.end)>=new Date()
-  );
-
-  $('#statNext').textContent=next?next.title:'Nothing planned';
-
-  $('#statNextTime').textContent=next
-    ?(next.allDay?'All day':dtFmt(next.start))
-    :'Add an event to get started';
-
-  $('#todayEvents').innerHTML=ev.length
-    ?ev.map(e=>`
-      <div class="item">
-        <div class="item-main">
-          <div class="item-title">${esc(e.title)}</div>
-          <div class="item-meta">
-            ${e.allDay?'All day':dtFmt(e.start)}
-            ${e.location?' · '+esc(e.location):''}
-          </div>
-          ${e.source==='google'
-            ?'<span class="google-tag">Google Calendar</span>'
-            :''}
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">Nothing scheduled today.</div>';
-
-  const tasks=open.slice(0,5);
-
-  $('#todayTasks').innerHTML=tasks.length
-    ?tasks.map(t=>`
-      <div class="item">
-        <input class="check" type="checkbox" data-task-done="${esc(t.id)}">
-        <div class="item-main">
-          <div class="item-title">${esc(t.title)}</div>
-          <div class="item-meta">
-            ${t.due?'Due '+dateFmt(t.due,{day:'numeric',month:'short'}):'No due date'}
-            · ${esc(t.priority)}
-          </div>
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">No open tasks. You are clear.</div>';
-
-  $$('[data-task-done]').forEach(c=>
-    c.onchange=()=>toggleTask(c.dataset.taskDone)
-  );
-}
-
-/* =========================================================
-   CALENDAR
-   ========================================================= */
-
-let month=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-let selected=todayISO();
-
-function localDateKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function renderCalendar() {
-  $('#monthLabel').textContent=month.toLocaleDateString('en-AU',{
-    month:'long',
-    year:'numeric'
-  });
-
-  const first=new Date(month.getFullYear(),month.getMonth(),1);
-  const start=new Date(first);
-
-  start.setDate(first.getDate()-((first.getDay()+6)%7));
-
-  let html=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-    .map(x=>`<div class="weekday">${x}</div>`)
-    .join('');
-
-  for(let i=0;i<42;i++) {
-    const d=new Date(start);
-    d.setDate(start.getDate()+i);
-
-    const key=localDateKey(d);
-
-    const dayEvents=calendarEvents().filter(e=>
-      e.start.slice(0,10)===key
-    );
-
-    html+=`
-      <button class="day
-        ${d.getMonth()!==month.getMonth()?'out':''}
-        ${key===todayISO()?'today':''}
-        ${key===selected?'selected':''}"
-        data-day="${key}">
-        <span class="num">${d.getDate()}</span>
-        ${dayEvents.slice(0,2).map(e=>`
-          <span class="eventdot ${e.source==='google'?'google-dot':''}">
-            ${esc(e.title)}
-          </span>
-        `).join('')}
-      </button>
-    `;
-  }
-
-  $('#calendarGrid').innerHTML=html;
-
-  $$('[data-day]').forEach(b=>b.onclick=()=>{
-    selected=b.dataset.day;
-    renderCalendar();
-  });
-
-  $('#selectedDateLabel').textContent=dateFmt(selected,{
-    weekday:'long',
-    day:'numeric',
-    month:'long',
-    year:'numeric'
-  });
-
-  const todays=calendarEvents()
-    .filter(e=>e.start.slice(0,10)===selected)
-    .sort((a,b)=>a.start.localeCompare(b.start));
-
-  $('#selectedEvents').innerHTML=todays.length
-    ?todays.map(e=>`
-      <div class="item">
-        <div class="item-main">
-          <div class="item-title">${esc(e.title)}</div>
-          <div class="item-meta">
-            ${e.allDay?'All day':dtFmt(e.start)}
-            ${e.location?' · '+esc(e.location):''}
-          </div>
-          ${e.notes?`<div class="item-meta">${esc(e.notes)}</div>`:''}
-          ${e.source==='google'
-            ?'<span class="google-tag">Google Calendar</span>'
-            :''}
-        </div>
-
-        ${e.source==='google'
-          ?''
-          :`<div class="item-actions">
-              <button class="btn" data-edit-event="${esc(e.id)}">Edit</button>
-              <button class="btn danger" data-delete-event="${esc(e.id)}">×</button>
-            </div>`}
-      </div>
-    `).join('')
-    :'<div class="empty">No events on this day.</div>';
-
-  $$('[data-edit-event]').forEach(b=>
-    b.onclick=()=>editEvent(b.dataset.editEvent)
-  );
-
-  $$('[data-delete-event]').forEach(b=>
-    b.onclick=()=>deleteEvent(b.dataset.deleteEvent)
-  );
-
-  const upcoming=eventsSorted()
-    .filter(e=>new Date(e.end)>=new Date())
-    .slice(0,8);
-
-  $('#upcomingEvents').innerHTML=upcoming.length
-    ?upcoming.map(e=>`
-      <div class="item">
-        <div class="item-main">
-          <div class="item-title">${esc(e.title)}</div>
-          <div class="item-meta">
-            ${e.allDay?'All day':dtFmt(e.start)}
-            ${e.location?' · '+esc(e.location):''}
-          </div>
-          ${e.source==='google'
-            ?'<span class="google-tag">Google Calendar</span>'
-            :''}
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">No upcoming events.</div>';
-}
-
-function resetEventForm() {
-  [
-    'eventId',
-    'eventTitle',
-    'eventStart',
-    'eventEnd',
-    'eventLocation',
-    'eventNotes'
-  ].forEach(id=>$('#'+id).value='');
-
-  $('#eventFormTitle').textContent='Add local event';
-  $('#saveEvent').textContent='Save local event';
-}
-
-function editEvent(id) {
-  const e=data.events.find(x=>x.id===id);
-  if(!e)return;
-
-  $('#eventId').value=e.id;
-  $('#eventTitle').value=e.title;
-  $('#eventStart').value=e.start;
-  $('#eventEnd').value=e.end;
-  $('#eventLocation').value=e.location||'';
-  $('#eventNotes').value=e.notes||'';
-
-  $('#eventFormTitle').textContent='Edit local event';
-  $('#saveEvent').textContent='Update local event';
-}
-
-function deleteEvent(id) {
-  if(!confirm('Delete this local event?'))return;
-
-  data.events=data.events.filter(e=>e.id!==id);
-
-  save();
-  renderCalendar();
-  renderHome();
-
-  toast('Event deleted.');
-}
-
-$('#saveEvent').onclick=()=>{
-  const title=$('#eventTitle').value.trim();
-  const start=$('#eventStart').value;
-  const end=$('#eventEnd').value;
-
-  if(!title||!start||!end) {
-    return toast('Add a title, start and end time.');
-  }
-
-  if(
-    !validLocalDateTime(start)||
-    !validLocalDateTime(end)||
-    new Date(end)<=new Date(start)
-  ) {
-    return toast('Check your event dates and times.');
-  }
-
-  const id=$('#eventId').value||crypto.randomUUID();
-
-  const item={
-    id,
-    title,
-    start,
-    end,
-    location:$('#eventLocation').value.trim(),
-    notes:$('#eventNotes').value.trim()
-  };
-
-  const i=data.events.findIndex(e=>e.id===id);
-
-  if(i>=0)data.events[i]=item;
-  else data.events.push(item);
-
-  selected=start.slice(0,10);
-  month=new Date(selected+'T12:00:00');
-
-  save();
-  resetEventForm();
-  renderCalendar();
-  renderHome();
-
-  toast('Event saved locally.');
-};
-
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const STORE='jarvis.workspace.v2',p2=n=>String(n).padStart(2,'0');
+const dkey=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+const todayISO=()=>dkey(new Date());
+let data={name:'',tone:'direct',events:[],tasks:[],training:[],sprints:[],runs:[],seeded:false};
+try{data={...data,...JSON.parse(localStorage.getItem(STORE)||'{}')}}catch{}
+['events','tasks','training','sprints','runs'].forEach(k=>{if(!Array.isArray(data[k]))data[k]=[]});
+const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(data))}catch{toast('Could not save — browser storage may be full.')}};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800)}
+const dateFmt=(s,o={weekday:'short',day:'numeric',month:'short'})=>new Date(s+'T12:00:00').toLocaleDateString('en-AU',o);
+const dtFmt=s=>new Date(s).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+const events=()=>[...data.events].sort((a,b)=>a.start.localeCompare(b.start));
+const validDT=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v)&&!isNaN(new Date(v))&&dkey(new Date(v))===v.slice(0,10);
+
+/* ---- weekly schedule (edit times here, or in the calendar) ---- */
+const WEEK=[ // day 0=Sun … 6=Sat. until = last date it runs
+ {d:1,t:'Easy run',s:'06:45',e:'07:10',n:'Easy pace — you should be able to chat.'},
+ {d:2,t:'Plyometrics & acceleration',s:'06:45',e:'07:20',n:'Jumps, bounds and short accelerations.'},
+ {d:3,t:'Cricket training',s:'16:30',e:'17:30',until:'2027-02-24'},
+ {d:3,t:'Futsal (play & referee)',s:'17:30',e:'18:30',until:'2026-12-16',n:'Time is a guess — edit it.'},
+ {d:4,t:'Referee futsal',s:'17:20',e:'18:20',until:'2026-12-16'},
+ {d:5,t:'Cricket',s:'16:00',e:'19:00',until:'2027-02-24',n:'Time is a guess — edit it.'},
+ {d:6,t:'Cricket',s:'09:00',e:'15:00',until:'2027-02-24',n:'Time is a guess — edit it.'}];
+function seedSchedule(){
+ const have=new Set(data.events.map(e=>e.title+e.start)),end=new Date('2027-02-24T12:00:00');let n=0;
+ const add=(t,s,e,o={})=>{if(have.has(t+s))return;data.events.push({id:crypto.randomUUID(),title:t,start:s,end:e,location:o.l||'',notes:o.n||''});n++};
+ for(let d=new Date();d<=end;d.setDate(d.getDate()+1)){const k=dkey(d);
+  WEEK.forEach(w=>{if(w.d===d.getDay()&&(!w.until||k<=w.until))add(w.t,k+'T'+w.s,k+'T'+w.e,{n:w.n})})}
+ add('Work shift — Caffe Belgiorno','2026-11-09T18:00','2026-11-09T20:00',{l:'Caffe Belgiorno'});
+ data.seeded=true;save();return n}
+if(!data.seeded)seedSchedule();
+
+/* ---- running plan ---- */
+const PLAN=[['Sun','Rest','Full rest day. Sleep well.'],['Mon','Easy run','__E__'],['Tue','Plyometrics & acceleration','Jumps, bounds, 6×20 m accelerations.'],
+ ['Wed','Cricket + futsal','No extra hard running today.'],['Thu','Recovery + refereeing','Stretch, light walk, foam roll.'],['Fri','Cricket','Match day — warm up well.'],['Sat','Cricket','Match day — refuel after.']];
+if(!data.planStart){data.planStart=todayISO();save()}
+const planWeek=()=>Math.floor((new Date(todayISO())-new Date(data.planStart))/6048e5);
+const easyMin=()=>Math.min(30,15+Math.min(planWeek(),5)*3);
+const pace=(km,min)=>{const x=min/km,m=Math.floor(x),s=Math.round((x-m)*60);return s===60?`${m+1}:00`:`${m}:${p2(s)}`};
+const weekStart=d=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()-((x.getDay()+6)%7));return dkey(x)};
+
+/* ---- navigation ---- */
+const TITLES={home:'Overview',chat:'AI Assistant',calendar:'Calendar',tasks:'Tasks',training:'Running & Fitness',settings:'Settings'};
+function showView(n){$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+n));$$('.nav').forEach(b=>b.classList.toggle('active',b.dataset.view===n));
+ $('#pageTitle').textContent=TITLES[n]||n;$('#sidebar').classList.remove('open');$('#scrim').classList.remove('show');
+ if(n==='chat')setTimeout(()=>$('#chatInput').focus(),80);if(n==='calendar')renderCalendar();if(n==='tasks')renderTasks();if(n==='training')renderTraining()}
+$$('.nav').forEach(b=>b.onclick=()=>showView(b.dataset.view));$$('[data-open]').forEach(b=>b.onclick=()=>showView(b.dataset.open));
+$('#menu').onclick=()=>{$('#sidebar').classList.add('open');$('#scrim').classList.add('show')};
+$('#scrim').onclick=()=>{$('#sidebar').classList.remove('open');$('#scrim').classList.remove('show')};
+$$('[data-prompt]').forEach(b=>b.onclick=()=>{showView('chat');sendMessage(b.dataset.prompt)});
+
+/* ---- overview ---- */
+function refreshClock(){const n=new Date();$('#topDate').textContent=n.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'});
+ $('#sideDate').textContent=n.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});const h=n.getHours();
+ $('#greeting').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+(data.name?', '+data.name:'')+'.'}
+const weekKm=()=>{const w=weekStart(todayISO());return Math.round(data.runs.filter(r=>weekStart(r.date)===w).reduce((a,r)=>a+r.km,0)*10)/10};
+function renderHome(){const t=todayISO(),ev=events().filter(e=>e.start.slice(0,10)===t),open=data.tasks.filter(x=>!x.done);
+ $('#statEvents').textContent=ev.length;$('#statTasks').textContent=open.length;$('#statKm').textContent=weekKm();
+ const nx=events().find(e=>new Date(e.end)>=new Date());$('#statNext').textContent=nx?nx.title:'Nothing planned';$('#statNextTime').textContent=nx?dtFmt(nx.start):'';
+ $('#todayEvents').innerHTML=ev.length?ev.map(e=>`<div class="item"><div class="item-main"><div class="item-title">${esc(e.title)}</div><div class="item-meta">${dtFmt(e.start)}${e.location?' · '+esc(e.location):''}</div></div></div>`).join(''):'<div class="empty">Nothing scheduled today.</div>';
+ $('#todayTasks').innerHTML=open.length?open.slice(0,5).map(x=>`<div class="item"><input class="check" type="checkbox" data-td="${esc(x.id)}"><div class="item-main"><div class="item-title">${esc(x.title)}</div><div class="item-meta">${x.due?'Due '+dateFmt(x.due,{day:'numeric',month:'short'}):'No due date'} · ${esc(x.priority)}</div></div></div>`).join(''):'<div class="empty">No open tasks. You are clear.</div>';
+ $$('[data-td]').forEach(c=>c.onchange=()=>toggleTask(c.dataset.td))}
+
+/* ---- calendar ---- */
+let month=new Date(new Date().getFullYear(),new Date().getMonth(),1),selected=todayISO();
+function renderCalendar(){$('#monthLabel').textContent=month.toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+ const first=new Date(month.getFullYear(),month.getMonth(),1),st=new Date(first);st.setDate(first.getDate()-((first.getDay()+6)%7));
+ let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="wd">${x}</div>`).join('');const evs=events();
+ for(let i=0;i<42;i++){const d=new Date(st);d.setDate(st.getDate()+i);const k=dkey(d),de=evs.filter(e=>e.start.slice(0,10)===k);
+  h+=`<button class="day ${d.getMonth()!==month.getMonth()?'out':''} ${k===todayISO()?'today':''} ${k===selected?'sel':''}" data-day="${k}"><span class="num">${d.getDate()}</span>${de.slice(0,2).map(e=>`<span class="dot">${esc(e.title)}</span>`).join('')}</button>`}
+ $('#calendarGrid').innerHTML=h;$$('[data-day]').forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderCalendar()});
+ $('#selectedDateLabel').textContent=dateFmt(selected,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const td=evs.filter(e=>e.start.slice(0,10)===selected);
+ $('#selectedEvents').innerHTML=td.length?td.map(e=>`<div class="item"><div class="item-main"><div class="item-title">${esc(e.title)}</div><div class="item-meta">${dtFmt(e.start)} – ${new Date(e.end).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}${e.location?' · '+esc(e.location):''}</div>${e.notes?`<div class="item-meta">${esc(e.notes)}</div>`:''}</div><div class="item-actions"><button class="btn" data-ee="${esc(e.id)}">Edit</button><button class="btn danger" data-de="${esc(e.id)}">×</button></div></div>`).join(''):'<div class="empty">No events on this day.</div>';
+ $$('[data-ee]').forEach(b=>b.onclick=()=>editEvent(b.dataset.ee));$$('[data-de]').forEach(b=>b.onclick=()=>deleteEvent(b.dataset.de));
+ const up=evs.filter(e=>new Date(e.end)>=new Date()).slice(0,8);
+ $('#upcomingEvents').innerHTML=up.length?up.map(e=>`<div class="item"><div class="item-main"><div class="item-title">${esc(e.title)}</div><div class="item-meta">${dtFmt(e.start)}${e.location?' · '+esc(e.location):''}</div></div></div>`).join(''):'<div class="empty">No upcoming events.</div>'}
+function resetEventForm(){['eventId','eventTitle','eventStart','eventEnd','eventLocation','eventNotes'].forEach(i=>$('#'+i).value='');$('#eventFormTitle').textContent='Add event';$('#saveEvent').textContent='Save event'}
+function editEvent(id){const e=data.events.find(x=>x.id===id);if(!e)return;$('#eventId').value=e.id;$('#eventTitle').value=e.title;$('#eventStart').value=e.start;$('#eventEnd').value=e.end;$('#eventLocation').value=e.location||'';$('#eventNotes').value=e.notes||'';$('#eventFormTitle').textContent='Edit event';$('#saveEvent').textContent='Update event'}
+function deleteEvent(id){if(!confirm('Delete this event?'))return;data.events=data.events.filter(e=>e.id!==id);save();renderCalendar();renderHome();toast('Event deleted.')}
+$('#saveEvent').onclick=()=>{const title=$('#eventTitle').value.trim(),start=$('#eventStart').value,end=$('#eventEnd').value;
+ if(!title||!start||!end)return toast('Add a title, start and end time.');if(!validDT(start)||!validDT(end)||new Date(end)<=new Date(start))return toast('Check your dates and times.');
+ const id=$('#eventId').value||crypto.randomUUID(),it={id,title,start,end,location:$('#eventLocation').value.trim(),notes:$('#eventNotes').value.trim()},i=data.events.findIndex(e=>e.id===id);
+ if(i>=0)data.events[i]=it;else data.events.push(it);selected=start.slice(0,10);month=new Date(selected+'T12:00:00');month.setDate(1);save();resetEventForm();renderCalendar();renderHome();toast('Event saved.')};
 $('#cancelEvent').onclick=resetEventForm;
-
-$('#prevMonth').onclick=()=>{
-  month.setMonth(month.getMonth()-1);
-  renderCalendar();
-};
-
-$('#nextMonth').onclick=()=>{
-  month.setMonth(month.getMonth()+1);
-  renderCalendar();
-};
-
-$('#goToday').onclick=()=>{
-  month=new Date();
-  month.setDate(1);
-  selected=todayISO();
-  renderCalendar();
-};
-
-/* =========================================================
-   TASKS
-   ========================================================= */
-
-let taskFilter='all';
-
-function renderTasks() {
-  let list=[...data.tasks].sort((a,b)=>
-    (a.done-b.done)||
-    (a.due||'9999').localeCompare(b.due||'9999')
-  );
-
-  if(taskFilter==='open')list=list.filter(t=>!t.done);
-  if(taskFilter==='done')list=list.filter(t=>t.done);
-
-  $('#taskList').innerHTML=list.length
-    ?list.map(t=>`
-      <div class="item ${t.done?'done':''}">
-        <input class="check" type="checkbox"
-          data-task-done="${esc(t.id)}"
-          ${t.done?'checked':''}>
-
-        <div class="item-main">
-          <div class="item-title">${esc(t.title)}</div>
-          <div class="item-meta">
-            ${t.due?'Due '+dateFmt(t.due,{day:'numeric',month:'short'}):'No due date'}
-            · ${esc(t.priority)}
-            ${t.category?' · '+esc(t.category):''}
-          </div>
-        </div>
-
-        <div class="item-actions">
-          <button class="btn danger" data-task-delete="${esc(t.id)}">×</button>
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">No tasks in this view.</div>';
-
-  $$('[data-task-done]').forEach(c=>
-    c.onchange=()=>toggleTask(c.dataset.taskDone)
-  );
-
-  $$('[data-task-delete]').forEach(b=>b.onclick=()=>{
-    data.tasks=data.tasks.filter(t=>t.id!==b.dataset.taskDelete);
-    save();
-    renderTasks();
-    renderHome();
-  });
-}
-
-function toggleTask(id) {
-  const t=data.tasks.find(x=>x.id===id);
-
-  if(t)t.done=!t.done;
-
-  save();
-  renderTasks();
-  renderHome();
-}
-
-$('#addTask').onclick=()=>{
-  const title=$('#taskTitle').value.trim();
-
-  if(!title)return toast('Enter a task first.');
-
-  data.tasks.push({
-    id:crypto.randomUUID(),
-    title,
-    due:$('#taskDue').value,
-    priority:$('#taskPriority').value,
-    category:$('#taskCategory').value.trim(),
-    done:false
-  });
-
-  $('#taskTitle').value='';
-  $('#taskDue').value='';
-  $('#taskCategory').value='';
-
-  save();
-  renderTasks();
-  renderHome();
-
-  toast('Task added.');
-};
-
-$$('[data-filter]').forEach(b=>b.onclick=()=>{
-  taskFilter=b.dataset.filter;
-  renderTasks();
-});
-
-/* =========================================================
-   TRAINING AND SPRINT TRACKER
-   ========================================================= */
-
-function renderTraining() {
-  $('#trainingList').innerHTML=data.training.length
-    ?[...data.training].reverse().slice(0,12).map(t=>`
-      <div class="item">
-        <div class="item-main">
-          <div class="item-title">${esc(t.name)}</div>
-          <div class="item-meta">
-            ${dateFmt(t.date,{day:'numeric',month:'short',year:'numeric'})}
-            · ${t.duration} min
-          </div>
-          ${t.notes?`<div class="item-meta">${esc(t.notes)}</div>`:''}
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">No sessions logged yet.</div>';
-
-  $('#sprintList').innerHTML=data.sprints.length
-    ?[...data.sprints].reverse().slice(0,10).map(s=>`
-      <div class="item">
-        <div class="item-main">
-          <div class="item-title">
-            ${s.distance} m — ${Number(s.time).toFixed(2)} s
-          </div>
-          <div class="item-meta">
-            ${dateFmt(s.date,{day:'numeric',month:'short',year:'numeric'})}
-          </div>
-        </div>
-      </div>
-    `).join('')
-    :'<div class="empty">No sprint times recorded.</div>';
-}
-
-$('#addTraining').onclick=()=>{
-  const name=$('#trainingName').value.trim();
-  const duration=Number($('#trainingDuration').value);
-  const date=$('#trainingDate').value||todayISO();
-
-  if(!name||!(duration>0)) {
-    return toast('Enter a session name and duration.');
-  }
-
-  data.training.push({
-    id:crypto.randomUUID(),
-    name,
-    duration,
-    date,
-    notes:$('#trainingNotes').value.trim()
-  });
-
-  ['trainingName','trainingDuration','trainingNotes']
-    .forEach(id=>$('#'+id).value='');
-
-  save();
-  renderTraining();
-
-  toast('Session saved.');
-};
-
-$('#addSprint').onclick=()=>{
-  const distance=Number($('#sprintDistance').value);
-  const time=Number($('#sprintTime').value);
-
-  if(!(distance>0&&time>0)) {
-    return toast('Enter a valid distance and time.');
-  }
-
-  data.sprints.push({
-    distance,
-    time,
-    date:todayISO()
-  });
-
-  $('#sprintDistance').value='';
-  $('#sprintTime').value='';
-
-  save();
-  renderTraining();
-
-  toast('Sprint logged.');
-};
-
-/* =========================================================
-   AI CONTEXT AND CALENDAR ACTIONS
-   ========================================================= */
-
-let chatHistory=[];
-
-function addMessage(role,content) {
-  const d=document.createElement('div');
-
-  d.className='message '+role;
-  d.textContent=content;
-
-  $('#chatMessages').appendChild(d);
-  $('#chatMessages').scrollTop=$('#chatMessages').scrollHeight;
-
-  return d;
-}
-
-function assistantContext() {
-  const now=new Date();
-
-  const upcoming=eventsSorted()
-    .filter(e=>new Date(e.end)>=now)
-    .slice(0,40)
-    .map(e=>({
-      title:e.title,
-      start:e.start,
-      end:e.end,
-      location:e.location||'',
-      notes:e.notes||'',
-      source:e.source||'local',
-      allDay:Boolean(e.allDay)
-    }));
-
-  const tasks=data.tasks
-    .filter(t=>!t.done)
-    .slice(0,40)
-    .map(t=>({
-      title:t.title,
-      due:t.due||null,
-      priority:t.priority,
-      category:t.category||''
-    }));
-
-  const recentTraining=data.training
-    .slice(-10)
-    .map(t=>({
-      name:t.name,
-      date:t.date,
-      duration:t.duration,
-      notes:t.notes
-    }));
-
-  return {
-    today:todayISO(),
-    timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
-    googleCalendarConnected:Boolean(
-      googleAccessToken&&Date.now()<googleTokenExpiry-60000
-    ),
-    events:upcoming,
-    openTasks:tasks,
-    recentTraining,
-    sprintRecords:data.sprints.slice(-10)
-  };
-}
-
-function validLocalDateTime(value) {
-  if(
-    typeof value!=='string'||
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
-  ) {
-    return false;
-  }
-
-  const d=new Date(value);
-
-  return !Number.isNaN(d.getTime())&&
-    d.getFullYear()===Number(value.slice(0,4))&&
-    d.getMonth()+1===Number(value.slice(5,7))&&
-    d.getDate()===Number(value.slice(8,10))&&
-    d.getHours()===Number(value.slice(11,13))&&
-    d.getMinutes()===Number(value.slice(14,16));
-}
-
-/* Jarvis creates events in Google Calendar, not just locally. */
-
-async function createCalendarEvents(args) {
-  if(
-    !args||
-    !Array.isArray(args.events)||
-    args.events.length<1||
-    args.events.length>30
-  ) {
-    return {success:false,error:'Invalid event list.'};
-  }
-
-  try {
-    requireGoogleAccess();
-  } catch(error) {
-    return {success:false,error:error.message};
-  }
-
-  const results=[];
-
-  for(const event of args.events) {
-    const title=String(event.title||'').trim();
-    const start=event.start;
-    const end=event.end;
-
-    if(
-      !title||
-      title.length>100||
-      !validLocalDateTime(start)||
-      !validLocalDateTime(end)||
-      new Date(end)<=new Date(start)
-    ) {
-      results.push({
-        title:title||'Untitled event',
-        status:'rejected',
-        reason:'Invalid title, date or time.'
-      });
-      continue;
-    }
-
-    const duplicate=calendarEvents().find(e=>
-      e.title.toLowerCase()===title.toLowerCase()&&
-      e.start===start&&
-      e.end===end
-    );
-
-    if(duplicate) {
-      results.push({
-        title,
-        status:'skipped',
-        reason:'This event already exists.'
-      });
-      continue;
-    }
-
-    const conflict=calendarEvents().find(e=>
-      new Date(start)<new Date(e.end)&&
-      new Date(end)>new Date(e.start)
-    );
-
-    if(conflict) {
-      results.push({
-        title,
-        status:'conflict',
-        reason:`Overlaps with "${conflict.title}".`
-      });
-      continue;
-    }
-
-    try {
-      const created=await googleApi('/calendars/primary/events',{
-        method:'POST',
-        body:JSON.stringify({
-          summary:title,
-          start:{
-            dateTime:new Date(start).toISOString()
-          },
-          end:{
-            dateTime:new Date(end).toISOString()
-          },
-          location:String(event.location||'').slice(0,120),
-          description:String(event.notes||'').slice(0,250)
-        })
-      });
-
-      googleEvents.push(googleEventToJarvis(created));
-
-      results.push({
-        title,
-        status:'created',
-        start,
-        end
-      });
-
-    } catch(error) {
-      results.push({
-        title,
-        status:'failed',
-        reason:error.message
-      });
-    }
-  }
-
-  renderCalendar();
-  renderHome();
-
-  return {
-    success:true,
-    results,
-    created:results.filter(r=>r.status==='created').length,
-    skipped:results.filter(r=>r.status==='skipped').length,
-    conflicts:results.filter(r=>r.status==='conflict').length,
-    rejected:results.filter(r=>r.status==='rejected').length,
-    failed:results.filter(r=>r.status==='failed').length
-  };
-}
-
-async function executeJarvisTool(call) {
-  const name=call?.function?.name;
-
-  let args;
-
-  try {
-    args=JSON.parse(call.function.arguments||'{}');
-  } catch {
-    return {
-      success:false,
-      error:'The AI returned invalid tool arguments.'
-    };
-  }
-
-  if(name==='create_calendar_events') {
-    return await createCalendarEvents(args);
-  }
-
-  return {
-    success:false,
-    error:'Unknown Jarvis action.'
-  };
-}
-
-/* =========================================================
-   CHAT CONNECTION
-   ========================================================= */
-
-let sending=false;
-
-async function requestJarvis() {
-  const response=await fetch('/api/chat',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      messages:chatHistory.slice(-24),
-      context:assistantContext(),
-      tone:data.tone
-    })
-  });
-
-  const raw=await response.text();
-
-  let result={};
-
-  try {
-    result=raw?JSON.parse(raw):{};
-  } catch {}
-
-  if(!response.ok) {
-    throw new Error(
-      (result.error||result.message||'AI request failed.')+
-      ` (HTTP ${response.status})`
-    );
-  }
-
-  return result;
-}
-
-async function sendMessage(text) {
-  text=String(text||'').trim();
-
-  if(!text||sending)return;
-
-  sending=true;
-  $('#sendBtn').disabled=true;
-
-  addMessage('user',text);
-
-  chatHistory.push({
-    role:'user',
-    content:text
-  });
-
-  const waiting=addMessage('assistant','Jarvis is thinking…');
-
-  try {
-    let result=await requestJarvis();
-    let rounds=0;
-
-    while(
-      Array.isArray(result.toolCalls)&&
-      result.toolCalls.length>0&&
-      rounds<2
-    ) {
-      const calls=result.toolCalls;
-
-      chatHistory.push({
-        role:'assistant',
-        content:result.reply||null,
-        tool_calls:calls
-      });
-
-      for(const call of calls) {
-        const toolResult=await executeJarvisTool(call);
-
-        chatHistory.push({
-          role:'tool',
-          tool_call_id:call.id,
-          content:JSON.stringify(toolResult)
-        });
-      }
-
-      rounds++;
-      result=await requestJarvis();
-    }
-
-    if(result.toolCalls?.length) {
-      throw new Error(
-        'Too many action steps. Please split the request into smaller parts.'
-      );
-    }
-
-    const reply=result.reply||
-      'I completed the request, but could not generate a final explanation.';
-
-    waiting.textContent=reply;
-
-    chatHistory.push({
-      role:'assistant',
-      content:reply
-    });
-
-  } catch(error) {
-    waiting.textContent=
-      'I could not complete that request. '+error.message;
-
-    chatHistory.push({
-      role:'assistant',
-      content:'The previous request failed: '+error.message
-    });
-
-  } finally {
-    sending=false;
-    $('#sendBtn').disabled=false;
-    $('#chatInput').focus();
-  }
-}
-
-$('#chatForm').onsubmit=e=>{
-  e.preventDefault();
-
-  const value=$('#chatInput').value;
-  $('#chatInput').value='';
-
-  sendMessage(value);
-};
-
-$('#chatInput').onkeydown=e=>{
-  if(e.key==='Enter'&&!e.shiftKey) {
-    e.preventDefault();
-    $('#chatForm').requestSubmit();
-  }
-};
-
-/* =========================================================
-   SETTINGS AND BACKUPS
-   ========================================================= */
-
-function loadSettings() {
-  $('#displayName').value=data.name||'';
-  $('#assistantTone').value=data.tone||'direct';
-}
-
-$('#saveSettings').onclick=()=>{
-  data.name=$('#displayName').value.trim().slice(0,35);
-  data.tone=$('#assistantTone').value;
-
-  save();
-  refreshClock();
-
-  toast('Settings saved.');
-};
-
-$('#testAI').onclick=async()=>{
-  const p=$('#aiStatus');
-
-  p.textContent='Checking…';
-  p.style.color='var(--muted)';
-
-  try {
-    const r=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[{
-          role:'user',
-          content:'Reply with exactly: Jarvis connection is working.'
-        }],
-        context:assistantContext(),
-        tone:'concise'
-      })
-    });
-
-    const raw=await r.text();
-    let j={};
-
-    try {
-      j=raw?JSON.parse(raw):{};
-    } catch {}
-
-    if(!r.ok) {
-      throw new Error(
-        (j.error||j.message||'Vercel returned an error.')+
-        ` (HTTP ${r.status})`
-      );
-    }
-
-    p.textContent='Connected. '+j.reply;
-    p.style.color='var(--green)';
-
-  } catch(error) {
-    p.textContent='Connection failed: '+error.message;
-    p.style.color='var(--red)';
-  }
-};
-
-$('#exportData').onclick=()=>{
-  const blob=new Blob(
-    [JSON.stringify(data,null,2)],
-    {type:'application/json'}
-  );
-
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-
-  a.href=url;
-  a.download='jarvis-backup-'+todayISO()+'.json';
-  a.click();
-
-  URL.revokeObjectURL(url);
-};
-
+$('#prevMonth').onclick=()=>{month.setMonth(month.getMonth()-1);renderCalendar()};$('#nextMonth').onclick=()=>{month.setMonth(month.getMonth()+1);renderCalendar()};
+$('#goToday').onclick=()=>{month=new Date();month.setDate(1);selected=todayISO();renderCalendar()};
+
+/* ---- tasks ---- */
+let filt='all';
+function renderTasks(){let l=[...data.tasks].sort((a,b)=>(a.done-b.done)||(a.due||'9999').localeCompare(b.due||'9999'));if(filt==='open')l=l.filter(t=>!t.done);if(filt==='done')l=l.filter(t=>t.done);
+ $$('[data-filter]').forEach(b=>b.classList.toggle('on',b.dataset.filter===filt));
+ $('#taskList').innerHTML=l.length?l.map(t=>`<div class="item ${t.done?'done':''}"><input class="check" type="checkbox" data-td="${esc(t.id)}" ${t.done?'checked':''}><div class="item-main"><div class="item-title">${esc(t.title)}</div><div class="item-meta">${t.due?'Due '+dateFmt(t.due,{day:'numeric',month:'short'}):'No due date'} · ${esc(t.priority)}${t.category?' · '+esc(t.category):''}</div></div><div class="item-actions"><button class="btn danger" data-tx="${esc(t.id)}">×</button></div></div>`).join(''):'<div class="empty">No tasks in this view.</div>';
+ $$('[data-td]').forEach(c=>c.onchange=()=>toggleTask(c.dataset.td));$$('[data-tx]').forEach(b=>b.onclick=()=>{data.tasks=data.tasks.filter(t=>t.id!==b.dataset.tx);save();renderTasks();renderHome()})}
+function toggleTask(id){const t=data.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save();renderTasks();renderHome()}
+$('#addTask').onclick=()=>{const title=$('#taskTitle').value.trim();if(!title)return toast('Enter a task first.');
+ data.tasks.push({id:crypto.randomUUID(),title,due:$('#taskDue').value,priority:$('#taskPriority').value,category:$('#taskCategory').value.trim(),done:false});
+ ['taskTitle','taskDue','taskCategory'].forEach(i=>$('#'+i).value='');save();renderTasks();renderHome();toast('Task added.')};
+$$('[data-filter]').forEach(b=>b.onclick=()=>{filt=b.dataset.filter;renderTasks()});
+
+/* ---- running & fitness ---- */
+function renderTraining(){const runs=data.runs,tot=runs.reduce((a,r)=>a+r.km,0),good=runs.filter(r=>r.km>=1);
+ $('#tKm').textContent=weekKm();$('#tTotal').textContent=Math.round(tot*10)/10;$('#tRuns').textContent=runs.length;
+ const bp=good.length?good.reduce((b,r)=>r.min/r.km<b.min/b.km?r:b):null;$('#tBest').textContent=bp?pace(bp.km,bp.min):'–';
+ const ws=[];let w=new Date(weekStart(todayISO())+'T12:00:00');for(let i=7;i>=0;i--){const d=new Date(w);d.setDate(w.getDate()-i*7);ws.push(dkey(d))}
+ const km=ws.map(k=>runs.filter(r=>weekStart(r.date)===k).reduce((a,r)=>a+r.km,0)),mx=Math.max(1,...km);
+ $('#runBars').innerHTML=km.map((v,i)=>`<div class="bar"><span>${Math.round(v*10)/10}</span><i style="height:${v/mx*100}%"></i><span>${ws[i].slice(8)}/${ws[i].slice(5,7)}</span></div>`).join('');
+ const dow=new Date().getDay();
+ $('#planList').innerHTML=PLAN.map((p,i)=>`<div class="item ${i===dow?'now':''}"><div class="item-main"><div class="item-title">${p[0]} — ${p[1]}</div><div class="item-meta">${p[2].replace('__E__',easyMin()+' min easy run, relaxed pace.')}</div></div></div>`).join('');
+ $('#planNote').textContent=`Week ${planWeek()+1}: easy runs grow by 3 min each week up to 30 min. Add a minute to your tempo only when runs feel easy.`;
+ $('#runList').innerHTML=runs.length?[...runs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(r=>`<div class="item"><div class="item-main"><div class="item-title">${r.km} km · ${r.min} min · ${pace(r.km,r.min)}/km</div><div class="item-meta">${dateFmt(r.date,{day:'numeric',month:'short',year:'numeric'})} · ${esc(r.type)}</div></div><div class="item-actions"><button class="btn danger" data-rx="${esc(r.id)}">×</button></div></div>`).join(''):'<div class="empty">No runs logged yet.</div>';
+ $$('[data-rx]').forEach(b=>b.onclick=()=>{data.runs=data.runs.filter(r=>r.id!==b.dataset.rx);save();renderTraining();renderHome()});
+ $('#sprintList').innerHTML=data.sprints.length?[...data.sprints].reverse().slice(0,8).map(s=>`<div class="item"><div class="item-main"><div class="item-title">${s.distance} m — ${Number(s.time).toFixed(2)} s</div><div class="item-meta">${dateFmt(s.date,{day:'numeric',month:'short',year:'numeric'})}</div></div></div>`).join(''):'<div class="empty">No sprint times yet.</div>'}
+$('#addRun').onclick=()=>{const km=Number($('#runKm').value),min=Number($('#runMin').value);if(!(km>0&&min>0))return toast('Enter a distance and time.');
+ data.runs.push({id:crypto.randomUUID(),date:$('#runDate').value||todayISO(),km,min,type:$('#runType').value});$('#runKm').value='';$('#runMin').value='';save();renderTraining();renderHome();toast('Run saved.')};
+$('#addSprint').onclick=()=>{const distance=Number($('#sprintDistance').value),time=Number($('#sprintTime').value);if(!(distance>0&&time>0))return toast('Enter a valid distance and time.');
+ data.sprints.push({distance,time,date:todayISO()});$('#sprintDistance').value='';$('#sprintTime').value='';save();renderTraining();toast('Sprint logged.')};
+
+/* ---- AI ---- */
+let chatHistory=[],sending=false;
+function addMessage(r,c){const d=document.createElement('div');d.className='message '+r;d.textContent=c;$('#chatMessages').appendChild(d);$('#chatMessages').scrollTop=1e9;return d}
+function assistantContext(){const now=new Date();return{today:todayISO(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
+ events:events().filter(e=>new Date(e.end)>=now).slice(0,40).map(e=>({title:e.title,start:e.start,end:e.end,location:e.location||'',notes:e.notes||''})),
+ openTasks:data.tasks.filter(t=>!t.done).slice(0,30).map(t=>({title:t.title,due:t.due||null,priority:t.priority})),
+ recentRuns:data.runs.slice(-8).map(r=>({date:r.date,km:r.km,min:r.min,type:r.type})),trainingWeek:planWeek()+1,sprintRecords:data.sprints.slice(-8)}}
+async function createCalendarEvents(args){
+ if(!args||!Array.isArray(args.events)||args.events.length<1||args.events.length>30)return{success:false,error:'Invalid event list.'};
+ const results=[];
+ for(const ev of args.events){const title=String(ev.title||'').trim(),{start,end}=ev;
+  if(!title||title.length>100||!validDT(start)||!validDT(end)||new Date(end)<=new Date(start)){results.push({title:title||'Untitled',status:'rejected',reason:'Invalid title, date or time.'});continue}
+  if(data.events.find(e=>e.title.toLowerCase()===title.toLowerCase()&&e.start===start&&e.end===end)){results.push({title,status:'skipped',reason:'Already exists.'});continue}
+  const c=data.events.find(e=>new Date(start)<new Date(e.end)&&new Date(end)>new Date(e.start));
+  if(c){results.push({title,status:'conflict',reason:`Overlaps "${c.title}" (${c.start} to ${c.end}).`});continue}
+  data.events.push({id:crypto.randomUUID(),title,start,end,location:String(ev.location||'').slice(0,120),notes:String(ev.notes||'').slice(0,250)});results.push({title,status:'created',start,end})}
+ save();renderCalendar();renderHome();return{success:true,results}}
+async function runTool(call){let a;try{a=JSON.parse(call.function.arguments||'{}')}catch{return{success:false,error:'Invalid tool arguments.'}}
+ return call.function.name==='create_calendar_events'?createCalendarEvents(a):{success:false,error:'Unknown action.'}}
+async function requestJarvis(){const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-24),context:assistantContext(),tone:data.tone})});
+ const raw=await r.text();let j={};try{j=raw?JSON.parse(raw):{}}catch{}if(!r.ok)throw new Error((j.error||j.message||'AI request failed.')+` (HTTP ${r.status})`);return j}
+async function sendMessage(text){text=String(text||'').trim();if(!text||sending)return;sending=true;$('#sendBtn').disabled=true;addMessage('user',text);
+ const mark=chatHistory.length;chatHistory.push({role:'user',content:text});const wait=addMessage('assistant','Jarvis is thinking…');
+ try{let res=await requestJarvis(),n=0;
+  while(res.toolCalls?.length&&n<2){chatHistory.push({role:'assistant',content:res.reply||null,tool_calls:res.toolCalls});
+   for(const c of res.toolCalls)chatHistory.push({role:'tool',tool_call_id:c.id,content:JSON.stringify(await runTool(c))});n++;res=await requestJarvis()}
+  if(res.toolCalls?.length)throw new Error('Too many steps. Split the request into smaller parts.');
+  const reply=res.reply||'Done, but I could not write a summary.';wait.textContent=reply;chatHistory.push({role:'assistant',content:reply})
+ }catch(e){wait.textContent='I could not complete that request. '+e.message;chatHistory.length=mark} /* drop half-finished tool turns so the next message works */
+ finally{sending=false;$('#sendBtn').disabled=false;$('#chatInput').focus()}}
+$('#chatForm').onsubmit=e=>{e.preventDefault();const v=$('#chatInput').value;$('#chatInput').value='';sendMessage(v)};
+$('#chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#chatForm').requestSubmit()}};
+
+/* ---- settings ---- */
+$('#saveSettings').onclick=()=>{data.name=$('#displayName').value.trim().slice(0,35);data.tone=$('#assistantTone').value;save();refreshClock();toast('Settings saved.')};
+$('#testAI').onclick=async()=>{const p=$('#aiStatus');p.textContent='Checking…';p.style.color='var(--muted)';
+ try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Reply with exactly: Jarvis connection is working.'}],context:{},tone:'concise'})});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error((j.error||'Vercel returned an error.')+` (HTTP ${r.status})`);p.textContent='Connected. '+j.reply;p.style.color='var(--green)'}
+ catch(e){p.textContent='Connection failed: '+e.message;p.style.color='var(--red)'}};
+$('#reseed').onclick=()=>{const n=seedSchedule();renderCalendar();renderHome();toast(n?`Added ${n} events.`:'Schedule already up to date.')};
+$('#exportData').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='jarvis-backup-'+todayISO()+'.json';a.click();URL.revokeObjectURL(u)};
 $('#importData').onclick=()=>$('#importFile').click();
-
-$('#importFile').onchange=async e=>{
-  const f=e.target.files[0];
-  if(!f)return;
-
-  try {
-    const j=JSON.parse(await f.text());
-
-    if(
-      !j||
-      !Array.isArray(j.events)||
-      !Array.isArray(j.tasks)
-    ) {
-      throw Error('This does not look like a Jarvis backup.');
-    }
-
-    data={...data,...j};
-
-    save();
-    location.reload();
-
-  } catch(error) {
-    toast(error.message);
-  }
-};
-
-$('#eraseData').onclick=()=>{
-  if(confirm(
-    'This permanently deletes Jarvis events, tasks, training and settings from this browser. Export a backup first if you need one.'
-  )) {
-    localStorage.removeItem(STORE);
-    location.reload();
-  }
-};
-
-/* =========================================================
-   INSTALLATION AND STARTUP
-   ========================================================= */
-
-let installPrompt=null;
-
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();
-
-  installPrompt=e;
-  $('#installBtn').hidden=false;
-});
-
-$('#installBtn').onclick=async()=>{
-  if(!installPrompt)return;
-
-  installPrompt.prompt();
-  await installPrompt.userChoice;
-
-  installPrompt=null;
-  $('#installBtn').hidden=true;
-};
-
-if(
-  'serviceWorker'in navigator&&
-  location.protocol.startsWith('http')
-) {
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  });
-}
-
-$('#trainingDate').value=todayISO();
-
-refreshClock();
-setInterval(refreshClock,30000);
-
-loadSettings();
-renderHome();
-renderCalendar();
-renderTasks();
-renderTraining();
-
-</script>
-</body>
-</html>
+$('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j||!Array.isArray(j.events)||!Array.isArray(j.tasks))throw Error('This does not look like a Jarvis backup.');data={...data,...j};save();location.reload()}catch(x){toast(x.message)}};
+$('#eraseData').onclick=()=>{if(confirm('This permanently deletes all Jarvis data from this browser. Export a backup first if you need one.')){localStorage.removeItem(STORE);location.reload()}};
+let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;$('#installBtn').hidden=false});
+$('#installBtn').onclick=async()=>{if(!ip)return;ip.prompt();await ip.userChoice;ip=null;$('#installBtn').hidden=true};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+$('#runDate').value=todayISO();$('#displayName').value=data.name||'';$('#assistantTone').value=data.tone||'direct';
+refreshClock();setInterval(refreshClock,30000);renderHome();renderCalendar();renderTasks();renderTraining();
+</script></body></html>
