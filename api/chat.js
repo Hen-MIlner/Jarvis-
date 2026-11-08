@@ -13,19 +13,25 @@ const ALLOWED_MODELS = new Set([
 
 const rateLimits = new Map();
 
+function sendError(res, status, message) {
+  return res.status(status).json({ error: message });
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
 
+  if (req.method === "GET") {
+    return res.status(200).json({ ok: true, service: "Jarvis AI", provider: "Groq", keyConfigured: Boolean(process.env.GROQ_API_KEY) });
+  }
   if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method not allowed." });
+    res.setHeader("Allow", "GET, POST");
+    return sendError(res, 405, "Method not allowed.");
   }
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({
-      error: "GROQ_API_KEY is missing. Add it in Vercel Environment Variables, then redeploy."
-    });
+    console.error("Jarvis configuration error: GROQ_API_KEY is missing");
+    return sendError(res, 500, "GROQ_API_KEY is missing. Add it in Vercel Environment Variables, then redeploy.");
   }
 
   const ip = String(req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim();
@@ -42,14 +48,14 @@ module.exports = async (req, res) => {
     try { body = JSON.parse(body); } catch { body = null; }
   }
   if (!body || !Array.isArray(body.messages) || body.messages.length < 1 || body.messages.length > 20) {
-    return res.status(400).json({ error: "Invalid request. Please refresh and try again." });
+    return sendError(res, 400, "Invalid request. Please refresh and try again.");
   }
 
   const messages = [];
   for (const message of body.messages) {
     if (!message || !["user", "assistant"].includes(message.role) ||
         typeof message.content !== "string" || message.content.length > 8000) {
-      return res.status(400).json({ error: "One of the messages is invalid or too long." });
+      return sendError(res, 400, "One of the messages is invalid or too long.");
     }
     messages.push({ role: message.role, content: message.content });
   }
@@ -106,20 +112,24 @@ ${context}`;
     const payload = await upstream.json().catch(() => ({}));
     if (!upstream.ok) {
       const message = payload?.error?.message || `Groq returned an error (${upstream.status}).`;
-      return res.status(upstream.status === 429 ? 429 : 502).json({ error: message });
+      console.error("Groq API returned an error:", upstream.status, message);
+      return sendError(res, upstream.status === 429 ? 429 : 502, message);
     }
 
     const reply = payload?.choices?.[0]?.message?.content;
     if (typeof reply !== "string" || !reply.trim()) {
-      return res.status(502).json({ error: "Groq returned an empty response. Try again." });
+      console.error("Groq API returned an empty response");
+      return sendError(res, 502, "Groq returned an empty response. Try again.");
     }
 
     return res.status(200).json({ reply: reply.trim(), model: payload.model || model });
   } catch (error) {
+    console.error("Jarvis AI handler failed:", error && (error.stack || error.message || String(error)));
     if (error.name === "AbortError") {
-      return res.status(504).json({ error: "The AI request timed out. Try again." });
+      return sendError(res, 504, "The AI request timed out. Try again.");
     }
-    return res.status(500).json({ error: "The AI service could not be reached. Try again." });
+    return sendError(res, 500, "Jarvis server error. Open Vercel → Deployments → Functions → api/chat → Logs for the exact cause.");
   } finally {
     clearTimeout(timeout);
   }
+};
