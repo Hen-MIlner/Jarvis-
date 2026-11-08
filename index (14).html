@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Jarvis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b14;--panel:#0e1626;--line:#1c2a44;--text:#dbe7ff;--mute:#7d8fb0;--acc:#5ee7ff;--amber:#ffb347;--bad:#ff6b7a;--ok:#5dffb0;--hue:200;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.5 Manrope,system-ui,sans-serif;overflow-x:hidden}
+#bg{position:fixed;inset:0;z-index:-1;transition:background 1s}
+h1,h2,h3,.disp{font-family:'Chakra Petch',system-ui,sans-serif;letter-spacing:.02em}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 14px;transition:border-color .15s,background .15s}
+button:hover{border-color:var(--acc)}
+button.pri{background:var(--acc);color:#04121a;border-color:var(--acc);font-weight:600}
+button.bad{color:var(--bad)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input,select,textarea{background:#0a1220;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.app{display:grid;grid-template-columns:200px 1fr;min-height:100%}
+nav{position:sticky;top:0;height:100vh;padding:18px 12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px;background:rgba(7,11,20,.7);backdrop-filter:blur(8px)}
+nav .brand{font-size:20px;font-weight:700;padding:6px 10px 16px;color:var(--acc)}
+nav button{text-align:left;border:0;background:none;color:var(--mute);padding:10px 12px}
+nav button.on{background:var(--panel);color:var(--text);box-shadow:inset 3px 0 var(--acc)}
+main{padding:20px;max-width:1120px;width:100%;padding-bottom:90px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+#av{width:52px;height:52px;border-radius:50%;border:2px solid var(--acc);background:var(--panel) center/cover;cursor:pointer;flex:none}
+header h1{font-size:24px;line-height:1.2}
+header p{color:var(--mute);font-size:13px}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card{position:relative;background:linear-gradient(160deg,rgba(14,22,38,.92),rgba(10,16,28,.92));border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h3{font-size:16px;margin-bottom:10px}
+.mute{color:var(--mute)}.small{font-size:12.5px}
+.orbwrap{display:grid;place-items:center;padding:14px 0 6px}
+#orb{width:150px;height:150px;border-radius:50%;border:0;padding:0;position:relative;background:radial-gradient(circle at 35% 30%,#d9fbff,var(--acc) 35%,hsl(var(--hue),80%,25%) 75%);box-shadow:0 0 60px color-mix(in srgb,var(--acc) 55%,transparent);animation:breathe 4s ease-in-out infinite}
+#orb::before,#orb::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid color-mix(in srgb,var(--acc) 50%,transparent);animation:ring 4s ease-out infinite}
+#orb::after{animation-delay:2s}
+@keyframes breathe{50%{transform:scale(1.04)}}
+@keyframes ring{from{transform:scale(.9);opacity:.8}to{transform:scale(1.5);opacity:0}}
+.ev{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:flex-start}
+.ev:first-of-type{border-top:0}
+.ev .t{width:78px;flex:none;color:var(--acc);font-size:13px;font-weight:600}
+.ev .x{margin-left:auto;padding:2px 8px;font-size:12px}
+.day{font-family:'Chakra Petch';color:var(--amber);margin:14px 0 4px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 140px}
+.sess{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.sess:first-of-type{border-top:0}
+.sess input[type=checkbox]{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--acc)}
+.sess.done .b{opacity:.5;text-decoration:line-through}
+.sess.today{box-shadow:-3px 0 var(--amber);padding-left:10px}
+.pill{display:inline-block;background:#12203a;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--amber)}
+#msgs{display:flex;flex-direction:column;gap:10px;min-height:40vh;max-height:60vh;overflow-y:auto;padding:4px}
+.m{padding:10px 14px;border-radius:14px;max-width:88%;white-space:pre-wrap;word-wrap:break-word}
+.m.u{align-self:flex-end;background:#12335a}
+.m.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line)}
+.m code{background:#050a14;padding:1px 5px;border-radius:5px}
+.prop{align-self:flex-start;border:1px solid var(--amber);border-radius:14px;padding:12px;background:#1a1608}
+#chatform{display:flex;gap:8px;margin-top:10px}
+#chatform textarea{resize:none;height:46px}
+label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--acc);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9;max-width:90vw}
+#toast.show{opacity:1}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);margin-right:6px}.dot.ok{background:var(--ok)}
+#saver{position:fixed;inset:0;background:#02050b;z-index:20;display:none;place-items:center;text-align:center;cursor:pointer}
+#saver.on{display:grid}#saver .big{font-size:min(22vw,120px);font-weight:700;color:var(--acc);text-shadow:0 0 40px var(--acc)}
+
+#bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(94,231,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 20%,#000,transparent 75%);mask-image:radial-gradient(ellipse at 50% 20%,#000,transparent 75%)}
+.card::before,.card::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;opacity:.85}
+.card::before{top:-1px;left:-1px;border-top:2px solid var(--acc);border-left:2px solid var(--acc);border-radius:16px 0 0 0}
+.card::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--acc);border-right:2px solid var(--acc);border-radius:0 0 16px 0}
+#hclock{margin-left:auto;text-align:right;font-size:30px;font-weight:600;color:var(--acc);line-height:1}
+#hclock small{display:block;font:500 12px Manrope;color:var(--mute);margin-top:4px}
+.calwrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px}
+.calhead{display:flex;gap:8px;align-items:center;margin-bottom:12px}.calhead button{padding:6px 12px}
+.dow,.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow span{text-align:center;color:var(--mute);font-size:12px;padding-bottom:2px}
+.cell{min-height:58px;border:1px solid var(--line);border-radius:10px;background:#0a1220;padding:5px 6px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;font-size:13px}
+.cell.out{opacity:.35}.cell.today{border-color:var(--amber);color:var(--amber)}.cell.sel{background:#12335a;border-color:var(--acc)}
+.cell .dots{display:flex;gap:3px;flex-wrap:wrap}.dots i{width:6px;height:6px;border-radius:50%;background:var(--acc)}.dots i.ad{background:var(--amber)}
+.cell .n{font-size:10.5px;color:var(--mute)}
+.sh{font-family:'Chakra Petch';color:var(--amber);margin:18px 0 8px;font-size:15px}.sh:first-child{margin-top:0}
+.sgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.tile{background:#0a1220;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.tile .l{color:var(--mute);font-size:12px}.tile .v{font:600 21px 'Chakra Petch';line-height:1.25;margin-top:2px;overflow-wrap:anywhere}
+.tile .s{color:var(--mute);font-size:11.5px}.tile canvas{width:100%;height:30px;display:block;margin-top:4px}
+.svc{display:flex;gap:14px;flex-wrap:wrap}
+@media(max-width:820px){.calwrap{grid-template-columns:1fr}#hclock{font-size:22px}.cell{min-height:50px}}
+@media(max-width:820px){
+ .app{grid-template-columns:1fr}
+ nav{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;padding:6px 6px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);z-index:5;background:rgba(7,11,20,.95)}
+ nav .brand{display:none}nav button{padding:8px 6px;font-size:12px;text-align:center;flex:1}
+ nav button.on{box-shadow:inset 0 -3px var(--acc)}
+ main{padding:14px 14px 90px}
+ #toast{bottom:80px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div class="app">
+<nav id="nav">
+ <div class="brand disp">JARVIS</div>
+ <button data-v="home" class="on">Home</button><button data-v="chat">Chat</button><button data-v="cal">Calendar</button><button data-v="train">Training</button><button data-v="stats">Stats</button><button data-v="set">Settings</button>
+</nav>
+<main>
+<header>
+ <div id="av" role="button" tabindex="0" aria-label="Change photo" title="Tap to change photo"></div>
+ <div><h1 id="hi">Hello</h1><p id="date"></p></div><div id="hclock" class="disp" aria-hidden="true"></div>
+</header>
+<input type="file" id="file" accept="image/*" hidden>
+
+<section class="view on" id="v-home">
+ <div class="orbwrap"><button id="orb" aria-label="Talk to Jarvis"></button></div>
+ <p class="mute small" style="text-align:center;margin-bottom:16px">Tap the orb or press Space to chat</p>
+ <div class="grid">
+  <div class="card"><h3>Today</h3><div id="today"></div></div>
+  <div class="card"><h3>Training today</h3><div id="todayTrain"></div></div>
+  <div class="card"><h3>Quick actions</h3><div class="row">
+   <button data-go="chat" data-ask="Give me my briefing for today and tomorrow.">Daily briefing</button>
+   <button data-go="chat" data-ask="Find a good time this week for a 30 minute run, outside school hours.">Find run time</button>
+   <button data-go="cal">Add event</button><button id="saverBtn">Stats screen</button></div></div>
+ </div>
+</section>
+
+<section class="view" id="v-chat">
+ <div class="card"><div id="msgs"></div>
+  <form id="chatform"><textarea id="inp" placeholder="Ask Jarvis anything…" rows="1"></textarea><button class="pri" id="send">Send</button></form>
+  <p class="mute small" style="margin-top:8px">Jarvis can only propose calendar changes. Nothing is added until you tap Confirm and Google says yes.</p></div>
+</section>
+
+<section class="view" id="v-cal">
+ <div class="calwrap">
+  <div class="card">
+   <div class="calhead"><button id="pm" aria-label="Previous month">&lsaquo;</button><h3 id="mname" style="flex:1;text-align:center;margin:0"></h3><button id="nmn" aria-label="Next month">&rsaquo;</button><button id="tod">Today</button></div>
+   <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+   <div class="mgrid" id="mgrid"></div>
+   <p class="mute small" id="calnote" style="margin-top:10px"></p>
+  </div>
+  <div class="card"><h3 id="dayhead"></h3><div id="dayList"></div>
+   <div class="sh" style="margin-top:16px">Add event</div>
+   <label for="e-title" style="margin-top:0">Title</label><input id="e-title" maxlength="120">
+   <div class="row"><div><label for="e-start">Starts</label><input id="e-start" type="datetime-local"></div><div><label for="e-end">Ends</label><input id="e-end" type="datetime-local"></div></div>
+   <label for="e-loc">Location (optional)</label><input id="e-loc" maxlength="120">
+   <div style="margin-top:14px" class="row"><button class="pri" id="e-add">Add to Google Calendar</button><button id="refresh">Refresh</button></div></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>Coming up (14 days)</h3><div id="calList"></div></div>
+</section>
+
+<section class="view" id="v-stats">
+ <div class="card">
+  <div class="sh">Live performance</div><div class="sgrid" id="g-live"></div>
+  <div class="sh">This device</div><div class="sgrid" id="g-dev"></div>
+  <div class="sh">Your week</div><div class="sgrid" id="g-week"></div>
+  <div class="sh">Jarvis</div><div class="sgrid" id="g-jarvis"></div>
+  <div class="sh">Services</div><div class="svc" id="svc"></div>
+  <p class="mute small" style="margin-top:12px">Device readings come from your browser. Some phones hide battery and memory, and those tiles then say n/a.</p>
+ </div>
+</section>
+
+<section class="view" id="v-train">
+ <div class="card"><div class="row"><h3 style="flex:2">This week’s programme</h3><span class="pill" id="phase"></span></div><div id="plan"></div>
+  <p class="mute small" style="margin-top:10px">Warm up first, every time: 8–10 min jog, leg swings, high knees, skips, then 2–3 build-up runs. Stop a drill if you feel pain or get sloppy.</p></div>
+ <div class="card" style="margin-top:14px"><h3>Sprint log</h3>
+  <div class="row"><input id="s-d" type="number" placeholder="Distance (m)" inputmode="decimal"><input id="s-t" type="number" step="0.01" placeholder="Time (s)" inputmode="decimal"><button id="s-add">Log</button></div>
+  <div id="pbs" style="margin-top:12px"></div><div id="sprints" class="small mute" style="margin-top:8px"></div></div>
+</section>
+
+<section class="view" id="v-set">
+ <div class="grid">
+ <div class="card"><h3>Google Calendar</h3>
+  <p><span class="dot" id="gdot"></span><span id="gstat">Not connected</span></p>
+  <label for="cid">OAuth Client ID (not secret, ends in .apps.googleusercontent.com)</label>
+  <input id="cid" autocomplete="off" spellcheck="false" placeholder="123456-abc.apps.googleusercontent.com">
+  <div class="row" style="margin-top:12px"><button class="pri" id="gsave">Save and connect</button><button id="gtest">Test</button><button class="bad" id="gdis">Disconnect</button></div>
+  <p class="mute small" style="margin-top:10px">Jarvis can read, add and delete events on your main calendar and nothing else. Never paste a client secret anywhere. Google may ask you to re-approve about once an hour.</p></div>
+ <div class="card"><h3>You</h3>
+  <label for="nm">Display name</label><input id="nm" maxlength="30">
+  <label for="tstart">Training programme started (Monday)</label><input id="tstart" type="date">
+  <label for="mdl">AI model</label><select id="mdl"><option value="deepseek-chat">DeepSeek Chat (fast)</option><option value="deepseek-reasoner">DeepSeek Reasoner (slower, deeper)</option></select></div>
+ <div class="card"><h3>Look</h3>
+  <label for="acc">Accent colour</label><input id="acc" type="color" style="height:44px;padding:4px">
+  <div class="row" style="margin-top:12px"><button id="shuf">Shuffle background</button><button id="avbtn">Change photo</button></div>
+  <h3 style="margin-top:20px">Your data</h3><p class="mute small">Settings, training and your photo are saved only in this browser.</p>
+  <div style="margin-top:10px"><button class="bad" id="wipe">Erase everything</button></div></div>
+ </div>
+</section>
+</main>
+</div>
+<div id="saver"><div><div class="big" id="clock"></div><p class="mute" id="sdate"></p><p class="mute small" style="margin-top:20px">Tap to close</p></div></div>
+<div id="toast" role="status"></div>
+<script src="https://accounts.google.com/gsi/client" async defer onload="initG()"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEY='jarvis.v1';
+let S={name:'Henry',clientId:'',model:'deepseek-chat',accent:'#5ee7ff',seed:200,start:'',done:{},sprints:[],avatar:'',connected:false};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save: browser storage is full or blocked.')}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3600)}
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const TZ=Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+/* ---------- navigation ---------- */
+function go(v){$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));$$('nav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='chat')setTimeout(()=>$('#inp').focus(),50);window.scrollTo(0,0);if(v==='stats')startStats();else stopStats()}
+$$('nav button[data-v]').forEach(b=>b.onclick=()=>go(b.dataset.v));
+$('#orb').onclick=()=>go('chat');
+$$('[data-go]').forEach(b=>b.onclick=()=>{go(b.dataset.go);if(b.dataset.ask)ask(b.dataset.ask)});
+document.addEventListener('keydown',e=>{
+ const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+ if(e.key==='Escape'){$('#saver').classList.remove('on');go('home')}
+ else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();go('set')}
+ else if(e.key===' '&&!typing){e.preventDefault();go('chat')}
+});
+
+/* ---------- look ---------- */
+function look(){
+ document.documentElement.style.setProperty('--acc',S.accent);
+ document.documentElement.style.setProperty('--hue',S.seed%360);
+ const h=S.seed%360;
+ $('#bg').style.background=`radial-gradient(900px 500px at ${20+S.seed%60}% -10%,hsla(${h},80%,30%,.38),transparent),radial-gradient(700px 500px at 100% ${30+S.seed%50}%,hsla(${(h+70)%360},70%,25%,.28),transparent),#070b14`;
+ $('#av').style.backgroundImage=S.avatar?`url(${S.avatar})`:`radial-gradient(circle at 30% 30%,#fff,${S.accent})`;
+ $('#acc').value=S.accent;
+}
+$('#shuf').onclick=()=>{S.seed=Math.floor(Math.random()*360);save();look()};
+$('#acc').oninput=e=>{S.accent=e.target.value;save();look()};
+const pick=()=>$('#file').click();
+$('#av').onclick=pick;$('#avbtn').onclick=pick;$('#av').onkeydown=e=>{if(e.key==='Enter')pick()};
+$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const x=c.getContext('2d'),m=Math.min(img.width,img.height);x.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,160,160);S.avatar=c.toDataURL('image/jpeg',.8);save();look();URL.revokeObjectURL(img.src)};img.onerror=()=>toast('That file is not an image I can read.');img.src=URL.createObjectURL(f)};
+
+/* ---------- Google Calendar ---------- */
+let tc=null,tok=null,tokExp=0,pending=null,events=[];
+function gstat(){const ok=tok&&Date.now()<tokExp;$('#gdot').className='dot'+(ok?' ok':'');$('#gstat').textContent=ok?'Connected':(S.connected?'Session expired, tap Save and connect':'Not connected')}
+function initG(){
+ if(!S.clientId||!window.google||!google.accounts)return;
+ tc=google.accounts.oauth2.initTokenClient({client_id:S.clientId,scope:'https://www.googleapis.com/auth/calendar.events',
+  callback:r=>{if(r.error){pending&&pending.rej(new Error(r.error));pending=null;toast('Google said: '+r.error);gstat();return}
+   tok=r.access_token;tokExp=Date.now()+(Number(r.expires_in)-60)*1000;S.connected=true;save();gstat();pending&&pending.res();pending=null;loadEvents()},
+  error_callback:e=>{pending&&pending.rej(new Error(e.type));pending=null;toast('Sign-in was closed or blocked ('+(e.type||'error')+'). Allow pop-ups and try again.')}});
+}
+function ensure(){return new Promise((res,rej)=>{if(tok&&Date.now()<tokExp)return res();if(!tc)initG();if(!tc)return rej(new Error('Add your Client ID in Settings first.'));pending={res,rej};tc.requestAccessToken({prompt:S.connected?'':'consent'})})}
+async function gcal(path,opt={}){await ensure();const r=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/'+path,{...opt,headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'}});
+ if(r.status===401){tok=null;gstat();throw new Error('Google session expired. Tap Refresh to reconnect.')}
+ if(!r.ok){let m='Google error '+r.status;try{m=(await r.json()).error.message||m}catch(e){}throw new Error(m)}
+ return r.status===204?{}:r.json()}
+const VIEW={y:new Date().getFullYear(),m:new Date().getMonth()};let SEL=new Date();
+const gridStart=()=>{const s=mondayOf(new Date(VIEW.y,VIEW.m,1));return s};
+async function loadEvents(){
+ const t0=new Date();t0.setHours(0,0,0,0);const gs=gridStart();
+ const a=new Date(Math.min(gs,t0)),b=new Date(Math.max(gs.getTime()+42*864e5,t0.getTime()+14*864e5));
+ try{const j=await gcal(`events?singleEvents=true&orderBy=startTime&maxResults=250&timeMin=${encodeURIComponent(a.toISOString())}&timeMax=${encodeURIComponent(b.toISOString())}`);events=j.items||[];renderCal();renderToday()}
+ catch(e){toast(e.message)}
+}
+const evStart=e=>new Date(e.start.dateTime||e.start.date+'T00:00');
+const evEnd=e=>new Date(e.end&&(e.end.dateTime||e.end.date+'T00:00')||evStart(e));
+const evTime=e=>e.start.dateTime?evStart(e).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'All day';
+function evRow(e,del){const d=document.createElement('div');d.className='ev';d.innerHTML=`<div class="t">${esc(evTime(e))}</div><div><div>${esc(e.summary||'(no title)')}</div>${e.location?`<div class="mute small">${esc(e.location)}</div>`:''}</div>`;
+ if(del){const x=document.createElement('button');x.className='x bad';x.textContent='Delete';x.onclick=()=>delEvent(e);d.appendChild(x)}return d}
+const onDay=k=>events.filter(e=>iso(evStart(e))===k);
+function renderMonth(){
+ $('#mname').textContent=new Date(VIEW.y,VIEW.m,1).toLocaleDateString([],{month:'long',year:'numeric'});
+ const g=$('#mgrid');g.innerHTML='';const s=gridStart(),tk=iso(new Date()),sk=iso(SEL);
+ for(let i=0;i<42;i++){const d=new Date(s.getTime()+i*864e5);d.setHours(12);const k=iso(d),ev=onDay(k);
+  const c=document.createElement('button');c.className='cell'+(d.getMonth()!==VIEW.m?' out':'')+(k===tk?' today':'')+(k===sk?' sel':'');
+  c.setAttribute('aria-label',d.toDateString()+', '+ev.length+' events');
+  c.innerHTML=`<span>${d.getDate()}</span><span class="dots">${ev.slice(0,4).map(e=>`<i class="${e.start.dateTime?'':'ad'}"></i>`).join('')}</span>${ev.length>4?`<span class="n">+${ev.length-4}</span>`:''}`;
+  c.onclick=()=>{SEL=d;const p=iso(d)+'T';if(!$('#e-title').value){$('#e-start').value=p+'16:00';$('#e-end').value=p+'17:00'}renderMonth();renderDay()};g.appendChild(c)}
+ $('#calnote').textContent=tok?'Blue dots are timed events, amber dots are all-day.':'Connect Google Calendar in Settings to fill this in.'}
+function renderDay(){$('#dayhead').textContent=SEL.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'});const box=$('#dayList');box.innerHTML='';const ev=onDay(iso(SEL));
+ if(!ev.length)box.innerHTML='<p class="mute">'+(tok?'Nothing on this day.':'Not connected yet.')+'</p>';else ev.forEach(e=>box.appendChild(evRow(e,true)))}
+function renderUpcoming(){const box=$('#calList');box.innerHTML='';const t0=new Date().setHours(0,0,0,0),lim=t0+14*864e5;const list=events.filter(e=>evStart(e)>=t0&&evStart(e)<lim);
+ if(!list.length){box.innerHTML='<p class="mute">'+(tok?'No events in the next 14 days.':'Connect Google Calendar in Settings.')+'</p>';return}
+ let last='';list.forEach(e=>{const k=evStart(e).toDateString();if(k!==last){last=k;const h=document.createElement('div');h.className='day';h.textContent=evStart(e).toLocaleDateString([],{weekday:'long',day:'numeric',month:'short'});box.appendChild(h)}box.appendChild(evRow(e,true))})}
+function renderCal(){renderMonth();renderDay();renderUpcoming()}
+function renderToday(){const box=$('#today');box.innerHTML='';const t=onDay(iso(new Date()));
+ if(!t.length){box.innerHTML='<p class="mute">'+(tok?'Nothing on today.':'Connect Google Calendar in Settings to see your day.')+'</p>';return}t.forEach(e=>box.appendChild(evRow(e,false)))}
+function moveMonth(n){const d=new Date(VIEW.y,VIEW.m+n,1);VIEW.y=d.getFullYear();VIEW.m=d.getMonth();renderMonth();if(tok&&Date.now()<tokExp)loadEvents()}
+$('#pm').onclick=()=>moveMonth(-1);$('#nmn').onclick=()=>moveMonth(1);
+$('#tod').onclick=()=>{const n=new Date();VIEW.y=n.getFullYear();VIEW.m=n.getMonth();SEL=n;renderMonth();renderDay();if(tok&&Date.now()<tokExp)loadEvents()};
+async function addEvent(o){
+ const body={summary:o.title,location:o.location||undefined,description:o.description||undefined,start:{dateTime:new Date(o.start).toISOString(),timeZone:TZ},end:{dateTime:new Date(o.end).toISOString(),timeZone:TZ}};
+ const r=await gcal('events',{method:'POST',body:JSON.stringify(body)});
+ if(!r.id)throw new Error('Google did not confirm the event.');
+ toast('Google confirmed: “'+(r.summary||o.title)+'” was added.');loadEvents();return r}
+async function delEvent(e){if(!confirm('Delete “'+(e.summary||'this event')+'” from Google Calendar?'))return;
+ try{await gcal('events/'+encodeURIComponent(e.id),{method:'DELETE'});toast('Google confirmed: event deleted.');loadEvents()}catch(x){toast('Not deleted. '+x.message)}}
+$('#refresh').onclick=loadEvents;
+$('#e-add').onclick=async()=>{const t=$('#e-title').value.trim(),s=$('#e-start').value,e=$('#e-end').value;
+ if(!t||!s||!e)return toast('Fill in the title, start and end.');if(new Date(e)<=new Date(s))return toast('The end must be after the start.');
+ try{await addEvent({title:t,start:s,end:e,location:$('#e-loc').value.trim()});$('#e-title').value=''}catch(x){toast('Not added. '+x.message)}};
+$('#gsave').onclick=()=>{const v=$('#cid').value.trim();if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(v))return toast('That does not look like a Client ID. It should end in .apps.googleusercontent.com');
+ S.clientId=v;save();tc=null;initG();ensure().then(()=>toast('Connected to Google Calendar.')).catch(e=>toast(e.message))};
+$('#gtest').onclick=async()=>{try{const j=await gcal('events?maxResults=1');toast('Test passed: Google answered ('+(j.items?j.items.length:0)+' event read).')}catch(e){toast('Test failed. '+e.message)}};
+$('#gdis').onclick=()=>{if(tok&&window.google)google.accounts.oauth2.revoke(tok,()=>{});tok=null;tokExp=0;S.connected=false;events=[];save();gstat();renderCal();renderToday();toast('Disconnected. Jarvis can no longer see your calendar.')};
+
+/* ---------- training ---------- */
+const mondayOf=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+function prog(day){ // day = Monday-based date
+ const st=mondayOf(S.start?new Date(S.start+'T00:00'):new Date());const w=Math.max(0,Math.round((mondayOf(day)-st)/(7*864e5)));const c=Math.floor(w/4),p=w%4;
+ return{w,c,p,run:[15,18,22,15][p]+2*c,sets:[[3,5],[3,6],[3,8],[2,5]][p],spr:[4,5,6,3][p]}}
+function plan(){const m=mondayOf(new Date()),P=prog(m);
+ $('#phase').textContent=(P.p===3?'Lighter week':'Build week '+(P.p+1)+' of 3')+(P.c?' · cycle '+(P.c+1):'');
+ const days=[
+  ['Monday','Easy run','Run '+P.run+' min at a pace where you can still talk. Then 2 sets of 8 bodyweight squats and hip hinges.',1],
+  ['Tuesday','Speed and jumps',`Pogo jumps, switches and broad jumps: ${P.sets[0]} sets of ${P.sets[1]} each, full rest. Then ${P.spr} sprints of 20–30 m, walk back between each. Stop when you slow down. Finish with 2 sets of single-leg balance.`,1],
+  ['Wednesday','Cricket and futsal','No extra running. Your match load is the training today.',0],
+  ['Thursday','Recovery and refereeing','Easy movement only. Good day for food, water and stretching.',0],
+  ['Friday','Cricket','No extra hard training.',0],['Saturday','Cricket','No extra hard training.',0],
+  ['Sunday','Rest','10 min of gentle mobility: hips, hamstrings, calves.',1]];
+ const box=$('#plan');box.innerHTML='';days.forEach((d,i)=>{const dt=new Date(m.getTime()+i*864e5),k=iso(dt);
+  const el=document.createElement('div');el.className='sess'+(S.done[k]?' done':'')+(k===iso(new Date())?' today':'');
+  el.innerHTML=`<input type="checkbox" aria-label="Done: ${d[0]}" ${S.done[k]?'checked':''}><div class="b"><strong class="disp">${d[0]}: ${d[1]}</strong><div class="mute">${esc(d[2])}</div></div>`;
+  el.querySelector('input').onchange=e=>{if(e.target.checked)S.done[k]=1;else delete S.done[k];save();plan();todayTrain()};box.appendChild(el)});
+ return days}
+function todayTrain(){const d=plan(),i=(new Date().getDay()+6)%7;const k=iso(new Date());$('#todayTrain').innerHTML=`<strong class="disp">${d[i][1]}</strong><div class="mute">${esc(d[i][2])}</div>${S.done[k]?'<p class="pill" style="margin-top:8px">Done</p>':''}`}
+function sprints(){const best={};S.sprints.forEach(s=>{if(!best[s.d]||s.t<best[s.d])best[s.d]=s.t});
+ $('#pbs').innerHTML=Object.keys(best).sort((a,b)=>a-b).map(d=>`<span class="pill" style="margin:0 6px 6px 0">${d} m PB: ${best[d]} s</span>`).join('')||'<span class="mute small">No sprints logged yet.</span>';
+ $('#sprints').textContent=S.sprints.slice(-6).reverse().map(s=>`${s.date}: ${s.d} m in ${s.t} s`).join('  |  ')}
+$('#s-add').onclick=()=>{const d=parseFloat($('#s-d').value),t=parseFloat($('#s-t').value);if(!(d>0&&t>0&&t<120))return toast('Enter a distance and a time in seconds.');S.sprints.push({d,t,date:iso(new Date())});save();sprints();$('#s-t').value='';toast('Sprint logged.')};
+
+/* ---------- chat ---------- */
+let hist=[],busy=false;
+function addMsg(role,text){const d=document.createElement('div');d.className='m '+(role==='user'?'u':'a');setText(d,text);$('#msgs').appendChild(d);$('#msgs').scrollTop=1e9;return d}
+function setText(d,t){d.innerHTML=esc(t).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')}
+function ctx(){const lim=Date.now()+14*864e5,t0=new Date().setHours(0,0,0,0);const lines=events.filter(e=>evStart(e)>=t0&&evStart(e)<lim).map(e=>`${evStart(e).toLocaleString('en-AU',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}: ${String(e.summary||'').slice(0,80)}${e.start.dateTime?'':' (all day)'}`);
+ const P=prog(new Date());return 'CALENDAR (next 14 days, '+(tok?'live from Google':'NOT CONNECTED, so no calendar data is available')+'):\n'+(lines.join('\n')||'none')+`\nTRAINING: week ${P.p+1} of cycle ${P.c+1}; run ${P.run} min; sprints logged: ${S.sprints.length}.`}
+function proposal(box,a){const ok=a&&a.type==='create_event'&&a.title&&!isNaN(new Date(a.start))&&!isNaN(new Date(a.end))&&new Date(a.end)>new Date(a.start);if(!ok)return;
+ const d=document.createElement('div');d.className='prop';d.innerHTML=`<strong>Proposed event</strong><div>${esc(String(a.title).slice(0,120))}</div><div class="mute small">${esc(new Date(a.start).toLocaleString())} to ${esc(new Date(a.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}))}</div>`;
+ const b=document.createElement('button');b.className='pri';b.textContent='Confirm';b.style.marginTop='8px';const n=document.createElement('button');n.textContent='Dismiss';n.style.cssText='margin:8px 0 0 8px';
+ b.onclick=async()=>{b.disabled=true;try{await addEvent({title:String(a.title).slice(0,120),start:a.start,end:a.end,location:String(a.location||'').slice(0,120),description:String(a.description||'').slice(0,500)});d.remove();addMsg('assistant','Google confirmed it. “'+a.title+'” is on your calendar.')}catch(e){b.disabled=false;toast('Not added. '+e.message)}};n.onclick=()=>d.remove();d.append(b,n);$('#msgs').appendChild(d);$('#msgs').scrollTop=1e9}
+async function ask(text){if(busy||!text.trim())return;busy=true;$('#send').disabled=true;hist.push({role:'user',content:text});addMsg('user',text);const out=addMsg('assistant','…');let acc='';
+ try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:S.model,messages:hist.slice(-20),context:ctx()})});
+  if(!r.ok){let m='Jarvis could not reach the AI ('+r.status+').';try{m=(await r.json()).error||m}catch(e){}throw new Error(m)}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+  for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+   for(const l of ls){if(!l.startsWith('data:'))continue;const x=l.slice(5).trim();if(!x||x==='[DONE]')continue;try{const c=JSON.parse(x).choices[0].delta.content;if(c){acc+=c;setText(out,acc.replace(/```action[\s\S]*$/,'').trim()||'…');$('#msgs').scrollTop=1e9}}catch(e){}}}
+  const m=acc.match(/```action\s*([\s\S]*?)```/);const shown=acc.replace(/```action[\s\S]*?```/,'').trim();setText(out,shown||'(no reply)');hist.push({role:'assistant',content:shown||'ok'});
+  if(m){try{proposal(out,JSON.parse(m[1]))}catch(e){toast('Jarvis sent an event I could not read, so nothing was proposed.')}}
+ }catch(e){out.remove();hist.pop();addMsg('assistant','Error: '+e.message+(location.protocol==='file:'?' (Open the Vercel link, not the file.)':''))}
+ busy=false;$('#send').disabled=false}
+$('#chatform').onsubmit=e=>{e.preventDefault();const v=$('#inp').value;$('#inp').value='';ask(v)};
+$('#inp').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#chatform').requestSubmit()}};
+
+/* ---------- screensaver ---------- */
+function clock(){const n=new Date();$('#clock').textContent=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#sdate').textContent=n.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'})+' · '+Object.keys(S.done).length+' sessions done'}
+$('#saverBtn').onclick=()=>{clock();$('#saver').classList.add('on')};$('#saver').onclick=()=>$('#saver').classList.remove('on');setInterval(clock,15000);
+
+/* ---------- stats ---------- */
+const ring={fps:[],lag:[],lat:[],heap:[]};const push=(a,v)=>{a.push(v);if(a.length>60)a.shift()};
+let statsOn=false,raf=0,frames=0,lastT=0,timers=[],bat=null,svc={page:null,ai:null,cal:null};const t_open=Date.now();
+const TILES={
+ live:[['fps','Frame rate','#st-fps',true],['lag','Main thread lag','',true],['lat','Page round trip','',true],['heap','JS memory','',true]],
+ dev:[['bat','Battery'],['net','Network'],['cores','CPU threads'],['ram','Device memory'],['stor','Storage used'],['scr','Screen'],['ori','Orientation'],['sess','This session'],['tz','Time zone']],
+ week:[['today','Events today'],['next','Next event'],['n14','Events, 14 days'],['busy','Busy hours, this week'],['wk','Days ticked this week'],['streak','Training streak'],['tot','Sessions done'],['spr','Sprints logged']],
+ jarvis:[['gcal','Google session'],['model','AI model'],['msgs','Messages this visit'],['pbs','Personal bests'],['cycle','Programme week']]};
+function buildStats(){for(const[g,list]of Object.entries(TILES)){const box=$('#g-'+(g==='dev'?'dev':g));box.innerHTML='';list.forEach(t=>{const d=document.createElement('div');d.className='tile';d.innerHTML=`<div class="l">${t[1]}</div><div class="v" id="st-${t[0]}">-</div><div class="s" id="ss-${t[0]}"></div>${t[3]?`<canvas id="sp-${t[0]}" width="240" height="60" aria-hidden="true"></canvas>`:''}`;box.appendChild(d)})}}
+const setT=(k,v,s)=>{const a=$('#st-'+k),b=$('#ss-'+k);if(a)a.textContent=v;if(b)b.textContent=s||''};
+function spark(id,arr,color){const c=$('#sp-'+id);if(!c||arr.length<2)return;const x=c.getContext('2d'),w=c.width,hh=c.height;x.clearRect(0,0,w,hh);const mx=Math.max(...arr,1),mn=Math.min(...arr,0);
+ const pt=(v,i)=>[i*(w/(arr.length-1)),hh-4-((v-mn)/((mx-mn)||1))*(hh-8)];x.beginPath();arr.forEach((v,i)=>{const[a,b]=pt(v,i);i?x.lineTo(a,b):x.moveTo(a,b)});x.strokeStyle=color;x.lineWidth=2;x.stroke();x.lineTo(w,hh);x.lineTo(0,hh);x.closePath();x.globalAlpha=.15;x.fillStyle=color;x.fill();x.globalAlpha=1}
+const dur=ms=>{ms=Math.max(0,ms);const m=Math.floor(ms/6e4);return m>=1440?Math.floor(m/1440)+'d '+Math.floor(m%1440/60)+'h':m>=60?Math.floor(m/60)+'h '+m%60+'m':m+' min'};
+function streak(){let n=0;const d=new Date();if(!S.done[iso(d)])d.setDate(d.getDate()-1);while(S.done[iso(d)]){n++;d.setDate(d.getDate()-1)}return n}
+function statTick(){
+ const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#5ee7ff';
+ const f=ring.fps.at(-1),l=ring.lag.at(-1),r=ring.lat.at(-1);
+ setT('fps',f?f+' fps':'-',f>=50?'smooth':f?'busy':'');setT('lag',l!=null?l+' ms':'-','event loop delay');setT('lat',r?r+' ms':(navigator.onLine?'-':'offline'),'to your Vercel host');
+ const pm=performance.memory;if(pm){const mb=Math.round(pm.usedJSHeapSize/1048576);push(ring.heap,mb);setT('heap',mb+' MB','of '+Math.round(pm.jsHeapSizeLimit/1048576)+' MB')}else setT('heap','n/a','not shared by this browser');
+ ['fps','lag','lat','heap'].forEach(k=>spark(k,ring[k],acc));
+ setT('bat',bat?Math.round(bat.level*100)+'%':'n/a',bat?(bat.charging?'charging':'on battery'):'hidden by browser');
+ const c=navigator.connection;setT('net',navigator.onLine?(c&&c.effectiveType?c.effectiveType.toUpperCase():'Online'):'Offline',c&&c.downlink?c.downlink+' Mbps down, '+c.rtt+' ms rtt':'');
+ setT('cores',navigator.hardwareConcurrency||'n/a','logical cores');setT('ram',navigator.deviceMemory?'~'+navigator.deviceMemory+' GB':'n/a','rounded by browser');
+ setT('scr',innerWidth+' × '+innerHeight,'pixel ratio '+(devicePixelRatio||1));setT('ori',innerWidth>innerHeight?'Landscape':'Portrait',matchMedia('(prefers-reduced-motion: reduce)').matches?'reduced motion on':'');
+ setT('sess',dur(Date.now()-t_open),'since you opened Jarvis');setT('tz',TZ.split('/').pop().replace('_',' '),'UTC'+(-new Date().getTimezoneOffset()/60>=0?'+':'')+(-new Date().getTimezoneOffset()/60));
+ const now=Date.now(),t0=new Date().setHours(0,0,0,0),tk=onDay(iso(new Date())),up=events.filter(e=>evStart(e)>now).sort((a,b)=>evStart(a)-evStart(b))[0],m=mondayOf(new Date()),me=m.getTime()+7*864e5;
+ const n14=events.filter(e=>evStart(e)>=t0&&evStart(e)<t0+14*864e5).length;
+ const busy=events.filter(e=>e.start.dateTime&&evStart(e)>=m&&evStart(e)<me).reduce((a,e)=>a+(evEnd(e)-evStart(e)),0)/36e5;
+ const conn=tok&&now<tokExp;setT('today',conn?tk.length:'-',conn?'':'not connected');setT('next',up?dur(evStart(up)-now):'-',up?String(up.summary||'').slice(0,28):(conn?'nothing coming up':'not connected'));
+ setT('n14',conn?n14:'-','');setT('busy',conn?(Math.round(busy*10)/10)+' h':'-','timed events only');
+ let wk=0;for(let i=0;i<7;i++)if(S.done[iso(new Date(m.getTime()+i*864e5))])wk++;setT('wk',wk+' / 7','');setT('streak',streak()+' day'+(streak()===1?'':'s'),'');setT('tot',Object.keys(S.done).length,'all time');setT('spr',S.sprints.length,'');
+ setT('gcal',conn?dur(tokExp-now):(S.connected?'Expired':'Off'),conn?'left before re-approval':'');setT('model',S.model==='deepseek-chat'?'Chat':'Reasoner','DeepSeek');setT('msgs',hist.length,'');
+ const best={};S.sprints.forEach(s=>{if(!best[s.d]||s.t<best[s.d])best[s.d]=s.t});setT('pbs',Object.keys(best).length,'distances');const P=prog(new Date());setT('cycle',(P.p===3?'Lighter':'Build '+(P.p+1)),'cycle '+(P.c+1));
+ const dot=v=>`<span class="dot${v?' ok':''}"></span>`;$('#svc').innerHTML=`<span>${dot(svc.page)}Jarvis page</span><span>${dot(svc.ai)}AI route</span><span>${dot(conn)}Google Calendar</span><span>${dot(navigator.onLine)}Internet</span>`}
+async function ping(){const t=performance.now();try{const r=await fetch(location.pathname,{method:'HEAD',cache:'no-store'});svc.page=r.ok;push(ring.lat,Math.round(performance.now()-t))}catch(e){svc.page=false;push(ring.lat,0)}}
+async function pingAI(){try{const r=await fetch('/api/chat',{method:'GET',cache:'no-store'});svc.ai=r.status===405}catch(e){svc.ai=false}}
+function startStats(){if(statsOn)return;statsOn=true;if(!$('#st-fps'))buildStats();frames=0;lastT=performance.now();
+ const loop=t=>{if(!statsOn)return;frames++;if(t-lastT>=1000){push(ring.fps,Math.round(frames*1000/(t-lastT)));frames=0;lastT=t;statTick()}raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
+ let exp=performance.now()+500;timers.push(setInterval(()=>{const n=performance.now();push(ring.lag,Math.max(0,Math.round(n-exp)));exp=n+500},500));
+ ping();pingAI();timers.push(setInterval(ping,4000),setInterval(pingAI,30000));statTick()}
+function stopStats(){statsOn=false;cancelAnimationFrame(raf);timers.forEach(clearInterval);timers=[]}
+if(navigator.getBattery)navigator.getBattery().then(b=>{bat=b}).catch(()=>{});
+function hclock(){const n=new Date();$('#hclock').innerHTML=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'<small>'+n.toLocaleDateString([],{weekday:'short',day:'numeric',month:'short'})+'</small>'}
+setInterval(hclock,5000);hclock();
+
+/* ---------- settings & start ---------- */
+$('#nm').onchange=e=>{S.name=e.target.value.trim().slice(0,30)||'Henry';save();greet()};
+$('#tstart').onchange=e=>{S.start=e.target.value;save();plan();todayTrain()};
+$('#mdl').onchange=e=>{S.model=e.target.value;save()};
+$('#wipe').onclick=()=>{if(confirm('Erase all Jarvis data from this browser?')){localStorage.removeItem(KEY);location.reload()}};
+function greet(){const h=new Date().getHours();$('#hi').textContent=(h<12?'Good morning, ':h<18?'Good afternoon, ':'Good evening, ')+S.name;$('#date').textContent=new Date().toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+$('#cid').value=S.clientId;$('#nm').value=S.name;$('#mdl').value=S.model;
+if(!S.start){S.start=iso(mondayOf(new Date()));save()}$('#tstart').value=S.start;
+look();greet();plan();todayTrain();sprints();renderToday();renderCal();gstat();
+if(!S.clientId)setTimeout(()=>toast('Start in Settings: add your Google Client ID.'),800);
+</script>
+</body>
+</html>
