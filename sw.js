@@ -1,5 +1,5 @@
-const CACHE = "jarvis-static-v1";
-const CORE = ["/", "/index.html", "/manifest.json", "/icons/icon.svg", "/icons/icon-maskable.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
+const CACHE = "jarvis-static-v2";
+const CORE = ["/", "/index.html", "/manifest.json", "/jarvis-logo.svg", "/icons/icon.svg", "/icons/icon-maskable.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
   self.skipWaiting();
