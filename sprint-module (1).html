@@ -1,0 +1,96 @@
+<!-- Paste this whole block just before </body> in index.html (after the service worker script). If you pasted the old sprint block, delete it first. -->
+<style>
+#sprintBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9998;background:#06202e;color:#00dcff;border:1px solid #00dcff;border-radius:999px;padding:10px 16px;font:600 14px system-ui;cursor:pointer;box-shadow:0 0 14px rgba(0,220,255,.35)}
+#sprintPanel{position:fixed;inset:0;z-index:9999;background:rgba(6,12,24,.97);color:#d8f6ff;font:15px system-ui;overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 40px;display:none}
+#sprintPanel h2{margin:0 0 4px;color:#00dcff}#sprintPanel h3{margin:18px 0 6px;color:#7fe9ff;font-size:15px}
+#sprintPanel .card{background:#0a1a2b;border:1px solid #12425a;border-radius:12px;padding:12px;margin-bottom:10px}
+#sprintPanel label{display:block;margin:6px 0}
+#sprintPanel input[type=text]{background:#06121f;color:#fff;border:1px solid #12425a;border-radius:8px;padding:8px;width:100%;box-sizing:border-box}
+#sprintPanel button{background:#00dcff;color:#041018;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;margin:6px 6px 0 0}
+#sprintPanel button.ghost{background:transparent;color:#00dcff;border:1px solid #00dcff}
+#sprintPanel button.on{background:#00dcff;color:#041018}
+.sp-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #12425a;padding:6px 0}
+.sp-tabs{display:flex;flex-wrap:wrap;margin:10px 0}
+</style>
+<button id="sprintBtn">⚡ Training</button>
+<div id="sprintPanel"></div>
+<script>
+(function(){
+  const KEY="jarvis_sprint_v2";
+  const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{sessions:[]}}catch(e){return{sessions:[]}}};
+  const save=d=>{try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}};
+  const WARM=["5 min easy jog","Leg swings + walking lunges","High knees, butt kicks, A-skips","2 x 20m build-ups"];
+  const COOL=["5 min walk","Hamstring, quad, calf, hip stretches"];
+  // Day numbers: 0=Sun, 1=Mon ... 6=Sat
+  const WEEK={
+    1:{short:"Mon",name:"Monday: Acceleration",type:"sprint",warm:WARM,
+       main:["3 x 10m starts (3-point or standing)","Hill sprints, knee on the ground start: 3 x 20m, walk back down","3 x 20m flat at 95-100%, rest 2-3 min","Broad jumps: 2 x 4","Standing triple jump: 2 x 5","Double broad jumps: 2 sets","Focus: low drive angle, powerful first 3 steps. Full rest between sets."],cool:COOL},
+    2:{short:"Tue",name:"Tuesday: Technique & Speed (moderate)",type:"sprint",warm:WARM,
+       main:["Pogo jumps: 3 x 10","Line hop: 2 x 10","Power skips: 3 x 8","Bounds: 2 x 5","4 x 30m at ~90%, rest 2 min","Focus: tall posture, stiff ankles, quick arm swing, relaxed face and shoulders"],cool:COOL},
+    4:{short:"Thu",name:"Thursday: Top Speed",type:"sprint",warm:WARM,
+       main:["3 x 30m build-ups (60%, 70%, 80%)","3 x flying 20m (20m build then 20m flat out), rest 3 min","2 x 40m at 95%, rest 4 min","Straight leg bounds: 3 x 20m","Max lateral hops: 2 x 5","Switch to a lateral jump: 2 x 5","Stop the sprints if times drop off"],cool:COOL},
+    0:{short:"Sun",name:"Sunday: Fitness",type:"fitness",
+       warm:["5 min easy jog or skipping","Arm circles, leg swings, hip openers"],
+       main:["20-30 min steady run (you can still talk)","Then 3 rounds: 15 squats, 10 push-ups, 20s plank, 10 lunges each leg, 30s rest between rounds","Optional: 6 x 30s hard / 30s walk"],
+       cool:["5 min walk","Full-body stretch"]}
+  };
+  const ORDER=[1,2,4,0];
+  const $=id=>document.getElementById(id);
+  const panel=$("sprintPanel");
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  function nextDay(){const t=new Date().getDay();for(let i=0;i<7;i++){const d=(t+i)%7;if(WEEK[d])return d}return 1}
+  let sel=null;
+  const best=d=>{const t=d.sessions.filter(s=>s.type==="sprint").flatMap(s=>s.reps);return t.length?Math.min(...t):null};
+  function render(){
+    const d=load();const today=new Date().getDay();
+    if(sel===null)sel=nextDay();
+    const S=WEEK[sel];
+    const list=l=>l.map(x=>`<label><input type="checkbox"> ${esc(x)}</label>`).join("");
+    const tabs=ORDER.map(k=>`<button class="${k===sel?"on":"ghost"}" data-d="${k}">${WEEK[k].short}${k===today?" •":""}</button>`).join("");
+    const rest=!WEEK[today]?`<div class="card">Today is a rest day. Next up: <b>${esc(WEEK[nextDay()].name)}</b>.</div>`:"";
+    const log=S.type==="sprint"
+      ?`<label>Rep times in seconds, comma separated<input id="spTimes" type="text" placeholder="3.05, 3.02, 3.08"></label>`
+      :`<label>Minutes trained<input id="spMins" type="text" placeholder="45"></label>`;
+    const hist=d.sessions.slice().reverse().slice(0,10).map(s=>{
+      const info=s.type==="sprint"?`${s.reps.length} reps, best ${Math.min(...s.reps).toFixed(2)}s`:`${s.mins||"?"} min`;
+      return `<div class="sp-row"><span>${esc(s.date)} ${esc(s.day||"")}</span><span>${esc(info)}</span></div>`}).join("")||"<i>Nothing logged yet.</i>";
+    const b=best(d);
+    panel.innerHTML=`<h2>⚡ Weekly Training</h2>
+    <div>Sprint days: Mon, Tue, Thu. Fitness: Sun. Best sprint time logged: <b>${b?b.toFixed(2)+"s":"none yet"}</b></div>
+    ${rest}<div class="sp-tabs">${tabs}</div>
+    <h3>${esc(S.name)}</h3>
+    <h3>Warm-up</h3><div class="card">${list(S.warm)}</div>
+    <h3>Main set</h3><div class="card">${list(S.main)}</div>
+    <h3>Cool-down</h3><div class="card">${list(S.cool)}</div>
+    <h3>Log this session</h3><div class="card">${log}
+      <label>Notes<input id="spNote" type="text" placeholder="how it felt"></label>
+      <button id="spSave">Save session</button></div>
+    <h3>History</h3><div class="card">${hist}</div>
+    <button class="ghost" id="spClose">Close</button>`;
+    panel.querySelectorAll("[data-d]").forEach(btn=>btn.onclick=()=>{sel=+btn.dataset.d;render()});
+    $("spClose").onclick=()=>panel.style.display="none";
+    $("spSave").onclick=()=>{
+      const d2=load();
+      const entry={date:new Date().toLocaleDateString("en-AU"),day:S.short,type:S.type,note:$("spNote").value};
+      if(S.type==="sprint"){
+        const reps=$("spTimes").value.split(",").map(x=>parseFloat(x)).filter(x=>x>0);
+        if(!reps.length){alert("Enter at least one time, e.g. 3.05");return}
+        entry.reps=reps;
+      }else{entry.mins=parseInt($("spMins").value)||0}
+      d2.sessions.push(entry);save(d2);render();
+    };
+  }
+  $("sprintBtn").onclick=()=>{sel=null;render();panel.style.display="block"};
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")panel.style.display="none";
+    if(e.altKey&&e.key.toLowerCase()==="r"){sel=null;render();panel.style.display="block"}
+  });
+  // Feed this into Jarvis's Groq system prompt so you can chat about your training.
+  window.getSprintContext=function(){
+    const d=load();const n=WEEK[nextDay()];
+    const last=d.sessions[d.sessions.length-1];
+    return`Weekly training: sprint Mon (acceleration), Tue (technique/speed), Thu (top speed); fitness Sun. Next session: ${n.name}. `+
+      (d.sessions.length?`${d.sessions.length} sessions logged. Best sprint time ${best(d)?best(d).toFixed(2)+"s":"n/a"}. Last: ${last.date} ${last.day}${last.reps?" reps "+last.reps.join(", ")+"s":last.mins?" "+last.mins+" min":""}.`:"Nothing logged yet.");
+  };
+})();
+</script>
